@@ -1,0 +1,48 @@
+/*<meta />*/
+
+.mlabels
+{
+	display: none;
+}
+
+.memproto
+{
+	padding: 0px;
+	height: 1px;
+}
+
+.memname
+{
+	display: none;
+}
+
+.memtitle
+{
+	font-size: 1.2em;
+}
+
+.paramname
+{
+	padding-right: 30px;
+}
+
+.groupheader
+{
+	font-size: 1.4em;
+}
+
+div.fragment
+{
+	padding: 8px 0 8px 0;
+}
+
+div.title
+{
+	font-size: 1.5em;
+}
+
+.memItemLeft
+{
+	text-align: left;
+}
+

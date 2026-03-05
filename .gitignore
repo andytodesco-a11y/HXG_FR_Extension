@@ -1,0 +1,25 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio local settings
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet packages
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Temporary files
+*.tmp
+*.temp
+Thumbs.db
+Desktop.ini
+
+# Claude Code local settings
+.claude/
