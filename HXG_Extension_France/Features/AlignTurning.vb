@@ -6,7 +6,7 @@ Imports EspritGeometryBase
 ''' Provides step-by-step turning part alignment tools:
 '''   - Align Part : aligns the selected solid along Z using the dominant revolution axis.
 '''   - Flip Part  : rotates the solid 180° around the Y axis through the world origin.
-'''   - Orient C   : (placeholder)
+'''   - Orient C   : rotates all document objects around Z to align the selected face or arc/circle edge with C = 0 (X axis).
 ''' </summary>
 Public Class AlignTurningFeature
     Implements IFeature
@@ -105,7 +105,7 @@ Public Class AlignTurningFeature
                 Return True
             Case BTN_ORIENT_C_KEY
                 e.Handled = True
-                DebugAnalyzeSolid()
+                OrientC()
                 Return True
         End Select
         Return False
@@ -342,6 +342,139 @@ Public Class AlignTurningFeature
         FlipSolid180(doc, solid)
         LogInfo("Part flipped 180° around Y axis through center of gravity.")
     End Sub
+
+    ''' <summary>
+    ''' Rotates all document objects around the Z axis to align the angular reference
+    ''' extracted from the selected face or edge with the X+ axis (C = 0°).
+    '''
+    ''' Supported selection (first valid item in the group wins):
+    '''   - Planar face               : face normal projected on XY → angle to X.
+    '''   - Cylindrical / conical face : surface axis projected on XY → angle to X.
+    '''   - Arc / circle edge          : edge centre projected on XY → angle to X.
+    ''' </summary>
+    Private Sub OrientC()
+        Dim doc As ESPRIT.Document = _app.Document
+        If doc Is Nothing Then LogWarning("No document is open.") : Return
+
+        If doc.Group.Count = 0 Then
+            LogWarning("Orient C: no element selected. Select a planar/cylindrical/conical face or an arc/circle edge.")
+            Return
+        End If
+
+        Dim refAngle As Double = Double.NaN
+
+        For i As Long = 1 To doc.Group.Count
+            Dim item As Object = doc.Group.Item(i)
+
+            If TypeOf item Is EspritSolids.ISolidFace Then
+                refAngle = GetOrientCAngleFromFace(CType(item, EspritSolids.ISolidFace))
+            ElseIf TypeOf item Is EspritSolids.ISolidEdge Then
+                refAngle = GetOrientCAngleFromEdge(CType(item, EspritSolids.ISolidEdge))
+            End If
+
+            If Not Double.IsNaN(refAngle) Then Exit For
+        Next
+
+        If Double.IsNaN(refAngle) Then
+            LogWarning("Orient C: no usable geometry found. Select a planar/cylindrical/conical face or an arc/circle edge.")
+            Return
+        End If
+
+        ' If the reference already sits on a cardinal angle (parallel or perpendicular to X),
+        ' step 90° CCW instead of doing nothing.
+        ' |sin(2θ)| = 0 exactly at multiples of 90° — use a small tolerance (~0.3°).
+        Const CARDINAL_TOL As Double = 0.01
+        Dim rotAngle As Double
+        If Math.Abs(Math.Sin(2.0 * refAngle)) < CARDINAL_TOL Then
+            rotAngle = Math.PI / 2.0
+        Else
+            rotAngle = -refAngle
+        End If
+
+        RotateAllDocumentObjects(doc, 0.0, 0.0, 1.0, rotAngle)
+        LogInfo($"Orient C: rotated {rotAngle * 180.0 / Math.PI:F4}° around Z.")
+        doc.Refresh()
+    End Sub
+
+    ''' <summary>
+    ''' Returns the angle (radians, measured from +X) of the face reference direction
+    ''' projected onto XY.  Returns Double.NaN when the surface type is unsupported or
+    ''' the XY projection is too small to determine a meaningful C angle (reference
+    ''' nearly aligned with Z).
+    ''' </summary>
+    Private Function GetOrientCAngleFromFace(face As EspritSolids.ISolidFace) As Double
+        Try
+            Dim surf As EspritSolids.ISolidSurface = face.SolidSurface
+            Dim uMin As Double = 0, uMax As Double = 0, vMin As Double = 0, vMax As Double = 0
+            face.FaceLimits(uMin, uMax, vMin, vMax)
+            Dim uMid As Double = (uMin + uMax) / 2.0
+            Dim vMid As Double = (vMin + vMax) / 2.0
+
+            Dim nx As Double, ny As Double
+
+            Select Case surf.SurfaceType
+                Case EspritSolids.SolidSurfaceType.geoSurfacePlane
+                    Dim n As IComVector = surf.NormalAlong(uMid, vMid)
+                    If n Is Nothing OrElse n.IsZero() Then Return Double.NaN
+                    nx = n.X : ny = n.Y
+
+                Case EspritSolids.SolidSurfaceType.geoSurfaceCylinder,
+                     EspritSolids.SolidSurfaceType.geoSurfaceCone
+                    Dim direction(2) As Double, centerBot(2) As Double
+                    Dim radius As Double = 0, tMin As Double = 0, tMax As Double = 0, angSpan As Double = 0
+                    If Not ExtractCylinderGeometry(face, direction, centerBot, radius, tMin, tMax, angSpan) Then
+                        Return Double.NaN
+                    End If
+                    nx = direction(0) : ny = direction(1)
+
+                Case Else
+                    Return Double.NaN
+            End Select
+
+            Dim projLen As Double = Math.Sqrt(nx * nx + ny * ny)
+            If projLen < 0.01 Then Return Double.NaN  ' reference nearly along Z — cannot determine C angle
+
+            Return Math.Atan2(ny, nx)
+        Catch
+            Return Double.NaN
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Returns the angle (radians, measured from +X) of the arc/circle edge centre
+    ''' projected onto XY.  Returns Double.NaN for non-arc edges or when the centre
+    ''' lies too close to the Z axis to determine a meaningful C angle.
+    ''' </summary>
+    Private Function GetOrientCAngleFromEdge(edge As EspritSolids.ISolidEdge) As Double
+        Try
+            Dim geo As Object = edge.EdgeGeometry
+            If geo Is Nothing Then Return Double.NaN
+
+            Dim cx As Double, cy As Double
+
+            ' IComArc inherits IComCircle — check IComArc first (partial arc).
+            If TypeOf geo Is IComArc Then
+                Dim arc As IComArc = CType(geo, IComArc)
+                Dim center As IComPoint = arc.CenterPoint
+                If center Is Nothing Then Return Double.NaN
+                cx = center.X : cy = center.Y
+            ElseIf TypeOf geo Is IComCircle Then
+                Dim circle As IComCircle = CType(geo, IComCircle)
+                Dim center As IComPoint = circle.CenterPoint
+                If center Is Nothing Then Return Double.NaN
+                cx = center.X : cy = center.Y
+            Else
+                Return Double.NaN
+            End If
+
+            Dim projLen As Double = Math.Sqrt(cx * cx + cy * cy)
+            If projLen < 0.01 Then Return Double.NaN  ' centre on Z axis — cannot determine C angle
+
+            Return Math.Atan2(cy, cx)
+        Catch
+            Return Double.NaN
+        End Try
+    End Function
 
     ' ── Solid selection ───────────────────────────────────────────────────────
 
@@ -991,6 +1124,12 @@ Public Class AlignTurningFeature
                     If obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espWorkCoordinate Then
                         Dim wc = CType(obj, ESPRIT.WorkCoordinate)
                         If wc.Name = "XYZ" Then Continue For
+                    ElseIf obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espLine Then
+                        Dim ln = CType(obj, ESPRIT.Line)
+                        If Val(ln.Key) < 0 Then Continue For
+                    ElseIf obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espPoint Then
+                        Dim pt = CType(obj, ESPRIT.Point)
+                        If Val(pt.Key) < 0 Then Continue For
                     End If
                     ss.Add(obj)
                 Catch
@@ -1060,7 +1199,7 @@ Public Class AlignTurningFeature
         Try
             Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
                 System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "HXG_Extension_France_Large.ico")
+            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "AlignTurning.ico")
             If System.IO.File.Exists(iconPath) Then
                 Return New System.Drawing.Icon(iconPath)
             End If

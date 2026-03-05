@@ -50,13 +50,15 @@ Public Class Main
         Dim tab As IRibbonTab = ribbon.Tabs.Add(RIBBON_TAB_KEY, "HXG Extension France")
 
         ' --- Register features here ---
-        _features.Add(New DebugExploration(_espritApplication))
+
         _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
-        _features.Add(New AddParkingOperationFeature(_espritApplication))
-        _features.Add(New SetCollinearAxisPositionFeature(_espritApplication))
-        _features.Add(New DetectAndAlignPartFeature(_espritApplication))
         _features.Add(New AlignTurningFeature(_espritApplication))
         _features.Add(New AlignMillingFeature(_espritApplication))
+
+        '_features.Add(New DetectAndAlignPartFeature(_espritApplication))
+        '_features.Add(New DebugExploration(_espritApplication))
+        '_features.Add(New AddParkingOperationFeature(_espritApplication))
+        '_features.Add(New SetCollinearAxisPositionFeature(_espritApplication))
 
 
         ' Initialize each feature's ribbon UI
