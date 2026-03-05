@@ -426,6 +426,11 @@ Public Class AlignTurningFeature
                         Return Double.NaN
                     End If
                     nx = direction(0) : ny = direction(1)
+                    ' Axis nearly along Z — fall back to cylinder centre XY position
+                    ' (handles off-axis bores / bosses whose centre defines the C angle).
+                    If Math.Sqrt(nx * nx + ny * ny) < 0.01 Then
+                        nx = centerBot(0) : ny = centerBot(1)
+                    End If
 
                 Case Else
                     Return Double.NaN
