@@ -1199,7 +1199,7 @@ Public Class AlignTurningFeature
         Try
             Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
                 System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "HXG_Extension_France_Large.ico")
+            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "AlignTurning.ico")
             If System.IO.File.Exists(iconPath) Then
                 Return New System.Drawing.Icon(iconPath)
             End If
