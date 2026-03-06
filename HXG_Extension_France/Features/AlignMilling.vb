@@ -28,9 +28,9 @@ Public Class AlignMillingFeature
     ' ── Ribbon keys ──────────────────────────────────────────────────────────
     Private Const RIBBON_GROUP_KEY As String = "AlignMilling_Group"
     Private Const BTN_ALIGN_KEY As String = "AlignMilling_Align_Btn"
+    Private Const BTN_ALIGN_X_KEY As String = "AlignMilling_AlignX_Btn"
 
     Private Const LOG_SOURCE As String = "MillingAlignment"
-    Private Const TEMP_SS_NAME As String = "_HXG_TempRotate"
 
     ''' <summary>
     ''' Minimum |dot product| for two unit normals to be grouped into the same
@@ -91,6 +91,7 @@ Public Class AlignMillingFeature
         Dim icon As System.Drawing.Icon = LoadIcon()
         Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Milling Alignment")
         group.Items.AddButton(BTN_ALIGN_KEY, "Align Part", True, icon)
+        group.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, icon)
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -98,6 +99,10 @@ Public Class AlignMillingFeature
             Case BTN_ALIGN_KEY
                 e.Handled = True
                 AlignPart()
+                Return True
+            Case BTN_ALIGN_X_KEY
+                e.Handled = True
+                AlignX()
                 Return True
         End Select
         Return False
@@ -581,58 +586,6 @@ Public Class AlignMillingFeature
 
         Dim angle As Double = Math.Acos(Math.Max(-1.0, Math.Min(1.0, dotZ)))
         RotateAllDocumentObjects(doc, rx / rLen, ry / rLen, 0.0, angle)
-    End Sub
-
-    ' ── Document rotation ─────────────────────────────────────────────────────
-
-    ''' <summary>
-    ''' Adds all document objects (except the XYZ work coordinate) to a temporary
-    ''' SelectionSet and rotates them by <paramref name="angle"/> radians around the
-    ''' unit axis (dx, dy, dz) through the world origin.
-    ''' </summary>
-    Private Sub RotateAllDocumentObjects(doc As ESPRIT.Document,
-                                         dx As Double,
-                                         dy As Double,
-                                         dz As Double,
-                                         angle As Double)
-        Try
-            doc.SelectionSets.Remove(TEMP_SS_NAME)
-        Catch
-        End Try
-
-        Dim ss As ESPRIT.SelectionSet = doc.SelectionSets.Add(TEMP_SS_NAME)
-        ss.RemoveAll()
-
-        Try
-            For Each obj As ESPRIT.GraphicObject In doc.GraphicsCollection
-                Try
-                    If obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espWorkCoordinate Then
-                        Dim wc = CType(obj, ESPRIT.WorkCoordinate)
-                        If wc.Name = "XYZ" Then Continue For
-                    ElseIf obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espLine Then
-                        Dim ln = CType(obj, ESPRIT.Line)
-                        If Val(ln.Key) < 0 Then Continue For
-                    ElseIf obj.GraphicObjectType = EspritConstants.espGraphicObjectType.espPoint Then
-                        Dim pt = CType(obj, ESPRIT.Point)
-                        If Val(pt.Key) < 0 Then Continue For
-                    End If
-                    ss.Add(obj)
-                Catch
-                End Try
-            Next
-
-            Dim origin As ESPRIT.Point = doc.GetPoint(0, 0, 0)
-            Dim rotAxis As ESPRIT.Line = doc.GetLine(origin, dx, dy, dz)
-            Try
-                ss.Rotate(rotAxis, angle, 0)
-            Finally
-                Try
-                    doc.SelectionSets.Remove(TEMP_SS_NAME)
-                Catch
-                End Try
-            End Try
-        Catch
-        End Try
     End Sub
 
     ' ── P0 placement ─────────────────────────────────────────────────────────
