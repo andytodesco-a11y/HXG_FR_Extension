@@ -28,7 +28,6 @@ Public Class AlignMillingFeature
     Implements IFeature
 
     ' ── Ribbon keys ──────────────────────────────────────────────────────────
-    Private Const RIBBON_GROUP_KEY As String = "AlignMilling_Group"
     Private Const BTN_ALIGN_KEY As String = "AlignMilling_Align_Btn"
     Private Const BTN_ALIGN_X_KEY As String = "AlignMilling_AlignX_Btn"
     Private Const BTN_ORIGIN_KEY As String = "AlignMilling_SetOrigin_Btn"
@@ -92,10 +91,11 @@ Public Class AlignMillingFeature
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
         Dim icon As System.Drawing.Icon = LoadIcon()
-        Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Milling Alignment")
-        group.Items.AddButton(BTN_ALIGN_KEY, "Align Part", True, icon)
-        group.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, icon)
-        group.Items.AddButton(BTN_ORIGIN_KEY, "Set Origin", True, icon)
+        Dim groupPart As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_ALIGN_PART_GROUP_KEY)
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, icon)
+        Dim groupOptions As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_OPTIONS_GROUP_KEY)
+        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, icon)
+        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, icon)
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -723,7 +723,7 @@ Public Class AlignMillingFeature
         Private Const PREF_REG_PATH As String = "Software\HXG_Extension_France\BoundingBoxOrigin"
         Private Shared _lastXYCol As Integer = 1   ' default: centre column
         Private Shared _lastXYRow As Integer = 1   ' default: centre row
-        Private Shared _lastZIdx  As Integer = 0   ' default: Z+
+        Private Shared _lastZIdx As Integer = 0   ' default: Z+
         Private Shared _prefsLoaded As Boolean = False
 
         Public Sub New()
@@ -734,7 +734,7 @@ Public Class AlignMillingFeature
                         If key IsNot Nothing Then
                             _lastXYCol = Math.Max(0, Math.Min(2, CInt(key.GetValue("XYCol", 1))))
                             _lastXYRow = Math.Max(0, Math.Min(2, CInt(key.GetValue("XYRow", 1))))
-                            _lastZIdx  = Math.Max(0, Math.Min(2, CInt(key.GetValue("ZIdx",  0))))
+                            _lastZIdx = Math.Max(0, Math.Min(2, CInt(key.GetValue("ZIdx", 0))))
                         End If
                     End Using
                 Catch
@@ -884,7 +884,7 @@ Public Class AlignMillingFeature
                 Using key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(PREF_REG_PATH)
                     key.SetValue("XYCol", selCol)
                     key.SetValue("XYRow", selRow)
-                    key.SetValue("ZIdx",  selZIdx)
+                    key.SetValue("ZIdx", selZIdx)
                 End Using
             Catch
             End Try

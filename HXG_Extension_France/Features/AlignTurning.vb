@@ -12,7 +12,8 @@ Public Class AlignTurningFeature
     Implements IFeature
 
     ' ── Ribbon keys ──────────────────────────────────────────────────────────
-    Private Const RIBBON_GROUP_KEY As String = "AlignTurning_Group"
+    Friend Const RIBBON_ALIGN_PART_GROUP_KEY As String = "AlignShared_Part_Group"
+    Friend Const RIBBON_OPTIONS_GROUP_KEY As String = "AlignShared_Options_Group"
     Private Const BTN_ALIGN_KEY As String = "AlignTurning_Align_Btn"
     Private Const BTN_FLIP_KEY As String = "AlignTurning_Flip_Btn"
 
@@ -86,10 +87,10 @@ Public Class AlignTurningFeature
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
         Dim icon As System.Drawing.Icon = LoadIcon()
-        Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Turning Alignment")
-        group.Items.AddButton(BTN_ALIGN_KEY, "Align Part", True, icon)
-        group.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, icon)
-
+        Dim groupPart As IRibbonGroup = tab.Groups.Add(RIBBON_ALIGN_PART_GROUP_KEY, "Align Part")
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Turning Part", True, icon)
+        Dim groupOptions As IRibbonGroup = tab.Groups.Add(RIBBON_OPTIONS_GROUP_KEY, "Align Options")
+        groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, icon)
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
