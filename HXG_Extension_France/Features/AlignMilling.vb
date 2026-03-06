@@ -1,5 +1,7 @@
 Imports ESPRIT.NetApi.Ribbon
 Imports EspritGeometryBase
+Imports System.Windows.Forms
+Imports System.Drawing
 
 ''' <summary>
 ''' Feature: Milling Alignment
@@ -29,6 +31,7 @@ Public Class AlignMillingFeature
     Private Const RIBBON_GROUP_KEY As String = "AlignMilling_Group"
     Private Const BTN_ALIGN_KEY As String = "AlignMilling_Align_Btn"
     Private Const BTN_ALIGN_X_KEY As String = "AlignMilling_AlignX_Btn"
+    Private Const BTN_ORIGIN_KEY As String = "AlignMilling_SetOrigin_Btn"
 
     Private Const LOG_SOURCE As String = "MillingAlignment"
 
@@ -92,6 +95,7 @@ Public Class AlignMillingFeature
         Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Milling Alignment")
         group.Items.AddButton(BTN_ALIGN_KEY, "Align Part", True, icon)
         group.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, icon)
+        group.Items.AddButton(BTN_ORIGIN_KEY, "Set Origin", True, icon)
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -103,6 +107,10 @@ Public Class AlignMillingFeature
             Case BTN_ALIGN_X_KEY
                 e.Handled = True
                 AlignX()
+                Return True
+            Case BTN_ORIGIN_KEY
+                e.Handled = True
+                SetBoundingBoxOrigin()
                 Return True
         End Select
         Return False
@@ -633,6 +641,259 @@ Public Class AlignMillingFeature
         End Try
         Return Nothing
     End Function
+
+    ' ── Bounding box origin placement ─────────────────────────────────────────
+
+    ''' <summary>
+    ''' Opens a dialog for the user to choose a point on the bounding box,
+    ''' then moves P0 to the computed world position.
+    ''' The solid body is resolved from the current selection before the dialog
+    ''' appears, so the user sees the dialog only when a valid selection exists.
+    ''' </summary>
+    Private Sub SetBoundingBoxOrigin()
+        Dim doc As ESPRIT.Document = _app.Document
+        If doc Is Nothing Then LogWarning("No document is open.") : Return
+
+        Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
+        If body Is Nothing Then Return
+
+        Using dlg As New BoundingBoxOriginDialog()
+            If dlg.ShowDialog() <> DialogResult.OK Then Return
+
+            Try
+                Dim minPt As IComPoint = Nothing
+                Dim maxPt As IComPoint = Nothing
+                Dim matrix As IComMatrix = CType(doc.Planes.Item("XYZ").GlobalToLocalMatrix, IComMatrix)
+                body.Box(matrix, minPt, maxPt)
+
+                Dim targetX As Double = minPt.X + (maxPt.X - minPt.X) * dlg.XFraction
+                Dim targetY As Double = minPt.Y + (maxPt.Y - minPt.Y) * dlg.YFraction
+                Dim targetZ As Double = minPt.Z + (maxPt.Z - minPt.Z) * dlg.ZFraction
+
+                Dim tempPoint As Object = doc.Points.Add(targetX, targetY, targetZ)
+                Try
+                    doc.MoveP0(tempPoint)
+                Finally
+                    Try
+                        doc.Points.Remove(CInt(doc.Points.IndexOf(tempPoint)))
+                    Catch
+                    End Try
+                End Try
+
+                LogInfo($"Origin set to ({targetX:F3}, {targetY:F3}, {targetZ:F3}).")
+                doc.Refresh()
+            Catch ex As Exception
+                LogWarning($"Could not set origin: {ex.Message}")
+            End Try
+        End Using
+    End Sub
+
+    ' ── Bounding box origin dialog ─────────────────────────────────────────────
+
+    ''' <summary>
+    ''' Dialog for selecting an origin point on the axis-aligned bounding box.
+    '''
+    ''' XY panel  — 3×3 grid of radio buttons schematising the rectangle face:
+    '''             corners at the 4 corners, midpoints at the 4 edge centres,
+    '''             and one button at the geometric centre.
+    '''             Lines are drawn between the buttons to make the rectangle visible.
+    '''
+    ''' Z panel   — 3 stacked radio buttons: Z+ (maxZ), Z Center (midZ), Z− (minZ).
+    '''
+    ''' Fractions in [0, 1]: 0 = min, 0.5 = centre, 1 = max along the bounding box.
+    ''' Defaults: XY centre, Z+ (top of the solid).
+    ''' </summary>
+    Private Class BoundingBoxOriginDialog
+        Inherits Form
+
+        Public XFraction As Double = 0.5   ' 0=minX … 1=maxX
+        Public YFraction As Double = 1.0   ' 0=minY … 1=maxY  (default: top of rect)
+        Public ZFraction As Double = 1.0   ' 0=minZ … 1=maxZ  (default: Z+)
+
+        ' _rbXY(col, row): col 0=left/minX … 2=right/maxX
+        '                  row 0=top/maxY (visual) … 2=bottom/minY (visual)
+        Private _rbXY(2, 2) As RadioButton
+        Private _rbZ(2) As RadioButton      ' 0=Z+, 1=ZCenter, 2=Z−
+
+        ' Dot-centre pixel positions used both for layout and for Paint.
+        Private _dotCX() As Integer
+        Private _dotCY() As Integer
+
+        ' Last selection — persisted in the registry across sessions.
+        Private Const PREF_REG_PATH As String = "Software\HXG_Extension_France\BoundingBoxOrigin"
+        Private Shared _lastXYCol As Integer = 1   ' default: centre column
+        Private Shared _lastXYRow As Integer = 1   ' default: centre row
+        Private Shared _lastZIdx  As Integer = 0   ' default: Z+
+        Private Shared _prefsLoaded As Boolean = False
+
+        Public Sub New()
+            If Not _prefsLoaded Then
+                _prefsLoaded = True
+                Try
+                    Using key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(PREF_REG_PATH)
+                        If key IsNot Nothing Then
+                            _lastXYCol = Math.Max(0, Math.Min(2, CInt(key.GetValue("XYCol", 1))))
+                            _lastXYRow = Math.Max(0, Math.Min(2, CInt(key.GetValue("XYRow", 1))))
+                            _lastZIdx  = Math.Max(0, Math.Min(2, CInt(key.GetValue("ZIdx",  0))))
+                        End If
+                    End Using
+                Catch
+                End Try
+            End If
+
+            Me.Text = "Set Bounding Box Origin"
+            Me.FormBorderStyle = FormBorderStyle.FixedDialog
+            Me.StartPosition = FormStartPosition.CenterScreen
+            Me.MaximizeBox = False
+            Me.MinimizeBox = False
+            Me.ClientSize = New Size(400, 280)
+            BuildXYGroup()
+            BuildZGroup()
+            BuildButtons()
+        End Sub
+
+        ' ── XY group ──────────────────────────────────────────────────────────
+
+        Private Sub BuildXYGroup()
+            Dim gb As New GroupBox()
+            gb.Text = "XY Position"
+            gb.Location = New Point(10, 10)
+            gb.Size = New Size(245, 215)
+            Me.Controls.Add(gb)
+
+            Dim pnl As New Panel()
+            pnl.Location = New Point(10, 22)
+            pnl.Size = New Size(225, 185)
+            gb.Controls.Add(pnl)
+
+            ' Radio button top-left positions (within the panel).
+            Dim colX() As Integer = {16, 96, 176}
+            Dim rowY() As Integer = {16, 76, 136}
+
+            ' The visual dot of a RadioButton (no text) is centred ~7 px from top-left.
+            _dotCX = New Integer() {colX(0) + 7, colX(1) + 7, colX(2) + 7}
+            _dotCY = New Integer() {rowY(0) + 7, rowY(1) + 7, rowY(2) + 7}
+
+            For col As Integer = 0 To 2
+                For row As Integer = 0 To 2
+                    Dim rb As New RadioButton()
+                    rb.Location = New Point(colX(col), rowY(row))
+                    rb.Size = New Size(20, 20)
+                    rb.AutoSize = False
+                    rb.Text = ""
+                    pnl.Controls.Add(rb)
+                    _rbXY(col, row) = rb
+                Next
+            Next
+
+            ' Restore last selection (or default: centre).
+            _rbXY(_lastXYCol, _lastXYRow).Checked = True
+
+            AddHandler pnl.Paint, AddressOf DrawXYGrid
+        End Sub
+
+        ''' <summary>
+        ''' Draws the rectangle schematic behind the radio buttons:
+        ''' solid lines for the outer border, dashed lines for the centre cross.
+        ''' </summary>
+        Private Sub DrawXYGrid(sender As Object, e As PaintEventArgs)
+            Dim g As Graphics = e.Graphics
+            g.SmoothingMode = Drawing2D.SmoothingMode.AntiAlias
+
+            Using pen As New Pen(Color.DimGray, 1.5F)
+                ' Outer rectangle
+                g.DrawLine(pen, _dotCX(0), _dotCY(0), _dotCX(2), _dotCY(0))  ' top
+                g.DrawLine(pen, _dotCX(0), _dotCY(2), _dotCX(2), _dotCY(2))  ' bottom
+                g.DrawLine(pen, _dotCX(0), _dotCY(0), _dotCX(0), _dotCY(2))  ' left
+                g.DrawLine(pen, _dotCX(2), _dotCY(0), _dotCX(2), _dotCY(2))  ' right
+            End Using
+
+            Using dashPen As New Pen(Color.Silver, 1.0F)
+                dashPen.DashStyle = Drawing2D.DashStyle.Dash
+                ' Centre cross
+                g.DrawLine(dashPen, _dotCX(0), _dotCY(1), _dotCX(2), _dotCY(1))  ' horizontal
+                g.DrawLine(dashPen, _dotCX(1), _dotCY(0), _dotCX(1), _dotCY(2))  ' vertical
+            End Using
+        End Sub
+
+        ' ── Z group ───────────────────────────────────────────────────────────
+
+        Private Sub BuildZGroup()
+            Dim gb As New GroupBox()
+            gb.Text = "Z Position"
+            gb.Location = New Point(268, 10)
+            gb.Size = New Size(118, 120)
+            Me.Controls.Add(gb)
+
+            Dim labels() As String = {"Z+", "Z Center", "Z−"}
+            For i As Integer = 0 To 2
+                Dim rb As New RadioButton()
+                rb.Text = labels(i)
+                rb.Location = New Point(12, 25 + i * 32)
+                rb.AutoSize = True
+                gb.Controls.Add(rb)
+                _rbZ(i) = rb
+            Next
+            _rbZ(_lastZIdx).Checked = True  ' Restore last selection (or default: Z+)
+        End Sub
+
+        ' ── Buttons ───────────────────────────────────────────────────────────
+
+        Private Sub BuildButtons()
+            Dim btnOK As New Button()
+            btnOK.Text = "OK"
+            btnOK.Location = New Point(228, 244)
+            btnOK.Size = New Size(75, 26)
+            Me.Controls.Add(btnOK)
+            Me.AcceptButton = btnOK
+            AddHandler btnOK.Click, AddressOf OnOKClick
+
+            Dim btnCancel As New Button()
+            btnCancel.Text = "Cancel"
+            btnCancel.DialogResult = DialogResult.Cancel
+            btnCancel.Location = New Point(313, 244)
+            btnCancel.Size = New Size(75, 26)
+            Me.Controls.Add(btnCancel)
+            Me.CancelButton = btnCancel
+        End Sub
+
+        Private Sub OnOKClick(sender As Object, e As EventArgs)
+            ' Read XY selection.
+            Dim selCol As Integer = 1, selRow As Integer = 1
+            Dim found As Boolean = False
+            For col As Integer = 0 To 2
+                For row As Integer = 0 To 2
+                    If _rbXY(col, row).Checked Then
+                        selCol = col : selRow = row
+                        XFraction = col * 0.5          ' 0=minX, 0.5=midX, 1=maxX
+                        YFraction = (2 - row) * 0.5    ' visual row 0 → maxY, row 2 → minY
+                        found = True
+                        Exit For
+                    End If
+                Next
+                If found Then Exit For
+            Next
+
+            ' Read Z selection.
+            Dim selZIdx As Integer = If(_rbZ(0).Checked, 0, If(_rbZ(1).Checked, 1, 2))
+            ZFraction = If(selZIdx = 0, 1.0, If(selZIdx = 1, 0.5, 0.0))
+
+            ' Persist selection for next session.
+            _lastXYCol = selCol : _lastXYRow = selRow : _lastZIdx = selZIdx
+            Try
+                Using key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(PREF_REG_PATH)
+                    key.SetValue("XYCol", selCol)
+                    key.SetValue("XYRow", selRow)
+                    key.SetValue("ZIdx",  selZIdx)
+                End Using
+            Catch
+            End Try
+
+            Me.DialogResult = DialogResult.OK
+            Me.Close()
+        End Sub
+
+    End Class
 
     ' ── Logging ──────────────────────────────────────────────────────────────
 
