@@ -130,10 +130,9 @@ Public Class AlignTurningFeature
         Dim doc As ESPRIT.Document = _app.Document
         If doc Is Nothing Then LogWarning("No document is open.") : Return
 
-        Dim solid As ESPRIT.ISolid = GetSelectedSolid(doc)
-        If solid Is Nothing Then Return
+        Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
+        If body Is Nothing Then Return
 
-        Dim body As EspritSolids.ISolidBody = CType(solid.SolidBody, EspritSolids.ISolidBody)
         Dim faces As EspritSolids.ISolidFaces = body.SolidFaces
         LogInfo("=== DEBUG AlignTurning — face analysis ===")
         LogInfo($"Total faces in solid: {faces.Count}")
@@ -302,10 +301,8 @@ Public Class AlignTurningFeature
         Dim doc As ESPRIT.Document = _app.Document
         If doc Is Nothing Then LogWarning("No document is open.") : Return
 
-        Dim solid As ESPRIT.ISolid = GetSelectedSolid(doc)
-        If solid Is Nothing Then Return
-
-        Dim body As EspritSolids.ISolidBody = CType(solid.SolidBody, EspritSolids.ISolidBody)
+        Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
+        If body Is Nothing Then Return
 
         Dim dominant As AxisLineCluster = GetDominantAxisLine(body)
         If dominant Is Nothing Then
@@ -316,7 +313,7 @@ Public Class AlignTurningFeature
         Dim cylFace As EspritSolids.ISolidFace = FindBestCylinderFace(body, dominant.RefDirection)
         If cylFace IsNot Nothing Then
             ' Preferred path: let ESPRIT align via the best cylindrical face.
-            solid.Grouped = False
+            doc.Group.Clear()
             doc.Group.Add(cylFace)
             doc.AlignAlongAxis("Z")
         Else
@@ -324,7 +321,7 @@ Public Class AlignTurningFeature
             AlignAxisToZ(doc, dominant.RefDirection)
         End If
 
-        MoveP0ToTopZ(doc, solid)
+        MoveP0ToTopZ(doc, body)
         LogInfo("Turning part aligned along Z axis.")
         doc.Refresh()
     End Sub
@@ -336,10 +333,10 @@ Public Class AlignTurningFeature
         Dim doc As ESPRIT.Document = _app.Document
         If doc Is Nothing Then LogWarning("No document is open.") : Return
 
-        Dim solid As ESPRIT.ISolid = GetSelectedSolid(doc)
-        If solid Is Nothing Then Return
+        Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
+        If body Is Nothing Then Return
 
-        FlipSolid180(doc, solid)
+        FlipSolid180(doc, body)
         LogInfo("Part flipped 180° around Y axis through center of gravity.")
     End Sub
 
@@ -484,24 +481,27 @@ Public Class AlignTurningFeature
     ' ── Solid selection ───────────────────────────────────────────────────────
 
     ''' <summary>
-    ''' Returns the selected solid after validating that exactly one element is selected
-    ''' and that it is an ISolid. Logs a specific warning and returns Nothing on failure.
+    ''' Returns the ISolidBody of the selected element.
+    ''' Accepts ISolid, ISolidFace, ISolidLoop, or ISolidEdge.
+    ''' Logs a warning and returns Nothing on failure.
     ''' </summary>
-    Private Function GetSelectedSolid(doc As ESPRIT.Document) As ESPRIT.ISolid
+    Private Function GetSelectedSolidBody(doc As ESPRIT.Document) As EspritSolids.ISolidBody
         If doc.Group.Count = 0 Then
-            LogWarning("No element selected. Please select a single solid.")
+            LogWarning("No element selected. Please select a solid, face, loop, or edge.")
             Return Nothing
         End If
         If doc.Group.Count > 1 Then
-            LogWarning("Multiple elements selected. Please select a single solid only.")
+            LogWarning("Multiple elements selected. Please select a single element only.")
             Return Nothing
         End If
-        Dim solid As ESPRIT.ISolid = TryCast(doc.Group.Item(1), ESPRIT.ISolid)
-        If solid Is Nothing Then
-            LogWarning("The selected element is not a solid.")
-            Return Nothing
-        End If
-        Return solid
+        Dim item As Object = doc.Group.Item(1)
+        Try
+            Dim body As EspritSolids.ISolidBody = TryCast(item.SolidBody, EspritSolids.ISolidBody)
+            If body IsNot Nothing Then Return body
+        Catch
+        End Try
+        LogWarning("The selected element is not a solid, face, loop, or edge.")
+        Return Nothing
     End Function
 
     ' ── Phase 1 : dominant axis detection ────────────────────────────────────
@@ -1160,8 +1160,8 @@ Public Class AlignTurningFeature
     ''' <summary>
     ''' Flips all document objects 180° around the Y axis at the world origin.
     ''' </summary>
-    Private Sub FlipSolid180(doc As ESPRIT.Document, solid As ESPRIT.ISolid)
-        MoveP0ToTopZ(doc, solid, toMinus:=True)
+    Private Sub FlipSolid180(doc As ESPRIT.Document, body As EspritSolids.ISolidBody)
+        MoveP0ToTopZ(doc, body, toMinus:=True)
         RotateAllDocumentObjects(doc, 0.0, 1.0, 0.0, Math.PI)
     End Sub
 
@@ -1171,10 +1171,9 @@ Public Class AlignTurningFeature
     ''' Computes the bounding box of the solid body and moves P0 to (0, 0, targetZ).
     ''' By default targetZ = maxZ (top face). Pass toMinus:=True to use minZ instead.
     ''' </summary>
-    Private Sub MoveP0ToTopZ(doc As ESPRIT.Document, solid As ESPRIT.ISolid,
+    Private Sub MoveP0ToTopZ(doc As ESPRIT.Document, body As EspritSolids.ISolidBody,
                               Optional toMinus As Boolean = False)
         Try
-            Dim body As EspritSolids.ISolidBody = CType(solid.SolidBody, EspritSolids.ISolidBody)
             Dim minPt As IComPoint = Nothing
             Dim maxPt As IComPoint = Nothing
 
