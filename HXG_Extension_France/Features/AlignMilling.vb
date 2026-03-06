@@ -90,12 +90,11 @@ Public Class AlignMillingFeature
     ' ── IFeature ─────────────────────────────────────────────────────────────
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
-        Dim icon As System.Drawing.Icon = LoadIcon()
         Dim groupPart As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_ALIGN_PART_GROUP_KEY)
-        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, icon)
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, LoadIcon("HXG_Extension_France_Large.ico"))
         Dim groupOptions As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_OPTIONS_GROUP_KEY)
-        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, icon)
-        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, icon)
+        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, LoadIcon("HXG_Extension_France_Large.ico"))
+        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, LoadIcon("HXG_Extension_France_Large.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -628,19 +627,6 @@ Public Class AlignMillingFeature
     End Sub
 
     ' ── Ribbon helpers ────────────────────────────────────────────────────────
-
-    Private Function LoadIcon() As System.Drawing.Icon
-        Try
-            Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "HXG_Extension_France_Large.ico")
-            If System.IO.File.Exists(iconPath) Then
-                Return New System.Drawing.Icon(iconPath)
-            End If
-        Catch
-        End Try
-        Return Nothing
-    End Function
 
     ' ── Bounding box origin placement ─────────────────────────────────────────
 

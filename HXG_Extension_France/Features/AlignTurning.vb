@@ -86,11 +86,10 @@ Public Class AlignTurningFeature
     ' ── IFeature ─────────────────────────────────────────────────────────────
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
-        Dim icon As System.Drawing.Icon = LoadIcon()
         Dim groupPart As IRibbonGroup = tab.Groups.Add(RIBBON_ALIGN_PART_GROUP_KEY, "Align Part")
-        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Turning Part", True, icon)
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Turning Part", True, LoadIcon("AlignTurning.ico"))
         Dim groupOptions As IRibbonGroup = tab.Groups.Add(RIBBON_OPTIONS_GROUP_KEY, "Align Options")
-        groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, icon)
+        Dim Button As IRibbonItem = groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, LoadIcon("HXG_Extension_France_Large.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -988,19 +987,6 @@ Public Class AlignTurningFeature
     End Sub
 
     ' ── Ribbon helpers ────────────────────────────────────────────────────────
-
-    Private Function LoadIcon() As System.Drawing.Icon
-        Try
-            Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "AlignTurning.ico")
-            If System.IO.File.Exists(iconPath) Then
-                Return New System.Drawing.Icon(iconPath)
-            End If
-        Catch
-        End Try
-        Return Nothing
-    End Function
 
     ' ── Logging ──────────────────────────────────────────────────────────────
 

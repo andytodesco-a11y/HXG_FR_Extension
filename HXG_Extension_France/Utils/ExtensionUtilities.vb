@@ -547,6 +547,25 @@ Public Module ExtensionUtilities
         doc.Refresh()
     End Sub
 
+    ' ── Ribbon helpers ────────────────────────────────────────────────────────
+
+    ''' <summary>
+    ''' Loads a .ico file by name from the same directory as the executing assembly.
+    ''' Returns Nothing if the file does not exist or cannot be loaded.
+    ''' </summary>
+    Public Function LoadIcon(iconFileName As String) As System.Drawing.Icon
+        Try
+            Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location)
+            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, iconFileName)
+            If System.IO.File.Exists(iconPath) Then
+                Return New System.Drawing.Icon(iconPath)
+            End If
+        Catch
+        End Try
+        Return Nothing
+    End Function
+
     ' ── EventWindow helpers ───────────────────────────────────────────────────
 
     Private Sub LogInfo(app As ESPRIT.Application, message As String)
