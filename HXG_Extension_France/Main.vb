@@ -27,6 +27,7 @@ Public Class Main
 
     Public Sub Connect(app As Object) Implements IExtension.Connect
         _espritApplication = DirectCast(app, ESPRIT.Application)
+        ExtensionUtilities.Initialize(_espritApplication)
         SetupRibbon()
     End Sub
 

@@ -478,32 +478,6 @@ Public Class AlignTurningFeature
         End Try
     End Function
 
-    ' ── Solid selection ───────────────────────────────────────────────────────
-
-    ''' <summary>
-    ''' Returns the ISolidBody of the selected element.
-    ''' Accepts ISolid, ISolidFace, ISolidLoop, or ISolidEdge.
-    ''' Logs a warning and returns Nothing on failure.
-    ''' </summary>
-    Private Function GetSelectedSolidBody(doc As ESPRIT.Document) As EspritSolids.ISolidBody
-        If doc.Group.Count = 0 Then
-            LogWarning("No element selected. Please select a solid, face, loop, or edge.")
-            Return Nothing
-        End If
-        If doc.Group.Count > 1 Then
-            LogWarning("Multiple elements selected. Please select a single element only.")
-            Return Nothing
-        End If
-        Dim item As Object = doc.Group.Item(1)
-        Try
-            Dim body As EspritSolids.ISolidBody = TryCast(item.SolidBody, EspritSolids.ISolidBody)
-            If body IsNot Nothing Then Return body
-        Catch
-        End Try
-        LogWarning("The selected element is not a solid, face, loop, or edge.")
-        Return Nothing
-    End Function
-
     ' ── Phase 1 : dominant axis detection ────────────────────────────────────
 
     ''' <summary>

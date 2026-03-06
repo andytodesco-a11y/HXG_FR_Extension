@@ -7,8 +7,44 @@ Imports EspritSolids
 Public Module ExtensionUtilities
 
     Private Const MSG_SOURCE As String = "AnalyzeFace"
+    Private Const SELECTION_SOURCE As String = "SolidBodySelection"
+
+    Private _app As ESPRIT.Application
+
+    ' ── Initialisation ────────────────────────────────────────────────────────
+
+    ''' <summary>
+    ''' Must be called once from Main.Connect before any utility function is used.
+    ''' </summary>
+    Public Sub Initialize(app As ESPRIT.Application)
+        _app = app
+    End Sub
 
     ' ── Public API ────────────────────────────────────────────────────────────
+
+    ''' <summary>
+    ''' Returns the ISolidBody of the single selected element.
+    ''' Accepts ISolid, ISolidFace, ISolidLoop, or ISolidEdge.
+    ''' Logs a warning and returns Nothing on failure.
+    ''' </summary>
+    Public Function GetSelectedSolidBody(doc As ESPRIT.Document) As EspritSolids.ISolidBody
+        If doc.Group.Count = 0 Then
+            LogWarning(SELECTION_SOURCE, "No element selected. Please select a solid, face, loop, or edge.")
+            Return Nothing
+        End If
+        If doc.Group.Count > 1 Then
+            LogWarning(SELECTION_SOURCE, "Multiple elements selected. Please select a single element only.")
+            Return Nothing
+        End If
+        Dim item As Object = doc.Group.Item(1)
+        Try
+            Dim body As EspritSolids.ISolidBody = TryCast(item.SolidBody, EspritSolids.ISolidBody)
+            If body IsNot Nothing Then Return body
+        Catch
+        End Try
+        LogWarning(SELECTION_SOURCE, "The selected element is not a solid, face, loop, or edge.")
+        Return Nothing
+    End Function
 
     ''' <summary>
     ''' Analyzes a SolidFace and reports its geometric properties to the EventWindow.
@@ -167,12 +203,20 @@ Public Module ExtensionUtilities
         End Select
     End Function
 
-    ' ── EventWindow helper ────────────────────────────────────────────────────
+    ' ── EventWindow helpers ───────────────────────────────────────────────────
 
     Private Sub LogInfo(app As ESPRIT.Application, message As String)
         app.EventWindow.AddMessage(
             EspritConstants.espMessageType.espMessageTypeInformation,
             MSG_SOURCE,
+            message)
+    End Sub
+
+    Private Sub LogWarning(source As String, message As String)
+        If _app Is Nothing Then Return
+        _app.EventWindow.AddMessage(
+            EspritConstants.espMessageType.espMessageTypeWarning,
+            source,
             message)
     End Sub
 
