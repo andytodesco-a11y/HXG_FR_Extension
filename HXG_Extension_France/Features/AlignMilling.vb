@@ -11,9 +11,10 @@ Imports EspritGeometryBase
 '''   Phase 3 — Score each cluster: score = TotalArea / CentroidThickness.
 '''             The axis where the most flat material lies AND the part is
 '''             thinnest scores highest — the natural milling Z direction.
-'''   Phase 4 — Split the winning cluster into top/bottom sub-groups by
-'''             centroid projection; pick the largest planar face from the
-'''             sub-group with the higher projection (the top faces).
+'''   Phase 4 — Split the winning cluster into top/bottom sub-groups;
+'''             primary: more faces = machined top; tiebreaker: smaller largest
+'''             single face = more fragmented = top.  Pick the largest planar face
+'''             from the top sub-group for AlignAlongAxis.
 '''   Phase 5 — AlignAlongAxis("Z") using that top face (or direct vector
 '''             rotation as fallback when no planar face is available).
 '''   Phase 6 — Orient XY: scan all horizontal planar faces (normal ≈ ±Z
@@ -344,10 +345,9 @@ Public Class AlignMillingFeature
     ''' Within the winning cluster, splits planar faces into two sub-groups:
     '''   positive group — normals ≈ +RefDirection
     '''   negative group — normals ≈ -RefDirection
-    ''' The sub-group whose mean centroid projection along RefDirection is higher
-    ''' contains the "top" faces (their outward normals point away from the solid
-    ''' in the +RefDirection sense, meaning they sit physically higher).
-    ''' Returns the largest-area planar face from that sub-group.
+    ''' SelectTopGroup identifies the machined top sub-group (more faces = primary,
+    ''' smaller largest face = tiebreaker). Returns the largest-area planar face from
+    ''' the top sub-group for use with AlignAlongAxis.
     ''' Returns Nothing if the cluster contains no planar face.
     ''' </summary>
     Private Function PickTopFace(cluster As AxisCluster) As EspritSolids.ISolidFace
@@ -366,7 +366,7 @@ Public Class AlignMillingFeature
             If dot >= 0 Then posGroup.Add(fi) Else negGroup.Add(fi)
         Next
 
-        Dim topGroup As List(Of FaceInfo) = SelectTopGroup(posGroup, negGroup, cluster.RefDirection)
+        Dim topGroup As List(Of FaceInfo) = SelectTopGroup(posGroup, negGroup)
         If topGroup Is Nothing OrElse topGroup.Count = 0 Then Return Nothing
 
         Dim bestFi As FaceInfo = Nothing
@@ -379,27 +379,40 @@ Public Class AlignMillingFeature
     End Function
 
     ''' <summary>
-    ''' Returns the face group (posGroup or negGroup) whose mean centroid
-    ''' projection along <paramref name="refDir"/> is greater (= physically higher).
+    ''' Returns the face group (posGroup or negGroup) that is the machined TOP side.
+    '''
+    ''' Primary heuristic — face count:
+    '''   More planar faces in a group means more machined features (pockets, bosses,
+    '''   islands) that fragment the surface.  The group with more faces is the top.
+    '''
+    ''' Tiebreaker — largest single face area:
+    '''   When face counts are equal, the group whose largest individual face is
+    '''   SMALLER is the more complex (fragmented) surface = machined top.
+    '''   The group with the larger single face is the flat datum = bottom.
+    '''
+    ''' Both criteria are orientation-independent.
     ''' </summary>
     Private Function SelectTopGroup(posGroup As List(Of FaceInfo),
-                                    negGroup As List(Of FaceInfo),
-                                    refDir As Double()) As List(Of FaceInfo)
+                                    negGroup As List(Of FaceInfo)) As List(Of FaceInfo)
         If posGroup.Count = 0 AndAlso negGroup.Count = 0 Then Return Nothing
         If posGroup.Count = 0 Then Return negGroup
         If negGroup.Count = 0 Then Return posGroup
 
-        Dim posProj As Double = MeanProjection(posGroup, refDir)
-        Dim negProj As Double = MeanProjection(negGroup, refDir)
-        Return If(posProj >= negProj, posGroup, negGroup)
-    End Function
+        ' Primary: more faces = more machined features = top.
+        If posGroup.Count <> negGroup.Count Then
+            Return If(posGroup.Count > negGroup.Count, posGroup, negGroup)
+        End If
 
-    Private Function MeanProjection(group As List(Of FaceInfo), dir As Double()) As Double
-        Dim s As Double = 0
-        For Each fi As FaceInfo In group
-            s += fi.Centroid(0) * dir(0) + fi.Centroid(1) * dir(1) + fi.Centroid(2) * dir(2)
+        ' Tiebreaker: smaller largest single face = more fragmented = machined top.
+        Dim posMaxArea As Double = 0
+        For Each fi As FaceInfo In posGroup
+            If fi.Area > posMaxArea Then posMaxArea = fi.Area
         Next
-        Return s / group.Count
+        Dim negMaxArea As Double = 0
+        For Each fi As FaceInfo In negGroup
+            If fi.Area > negMaxArea Then negMaxArea = fi.Area
+        Next
+        Return If(posMaxArea <= negMaxArea, posGroup, negGroup)
     End Function
 
     ' ── Phase 6 : orient XY ───────────────────────────────────────────────────
