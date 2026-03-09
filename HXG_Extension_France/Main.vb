@@ -52,9 +52,10 @@ Public Class Main
 
         ' --- Register features here ---
 
-        _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
+
         _features.Add(New AlignTurningFeature(_espritApplication))
         _features.Add(New AlignMillingFeature(_espritApplication))
+        _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
 
         '_features.Add(New DetectAndAlignPartFeature(_espritApplication))
         '_features.Add(New DebugExploration(_espritApplication))
