@@ -85,15 +85,16 @@ if (Test-Path $zipPath) {
 $filesToPackage = Get-ChildItem -Path $outputDir -File |
     Where-Object { $_.Extension -notin @('.pdb') }
 
-$tempDir = Join-Path $env:TEMP "hxg_package_$Version"
+$tempDir     = Join-Path $env:TEMP "hxg_package_$Version"
+$stagingDir  = Join-Path $tempDir "HXG_Extension_France"
 if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
-New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
+New-Item -ItemType Directory -Force -Path $stagingDir | Out-Null
 
-# Copy DLL + icons (preserving Icones subfolder if present)
-Copy-Item -Path (Join-Path $outputDir "*") -Destination $tempDir -Recurse -Force
+# Copy DLL + icons into the subfolder (preserving Icones subfolder if present)
+Copy-Item -Path (Join-Path $outputDir "*") -Destination $stagingDir -Recurse -Force
 
-# Remove debug symbols from the temp staging area
-Get-ChildItem $tempDir -Filter "*.pdb" | Remove-Item -Force
+# Remove debug symbols from the staging area
+Get-ChildItem $stagingDir -Filter "*.pdb" | Remove-Item -Force
 
 Compress-Archive -Path "$tempDir\*" -DestinationPath $zipPath
 Remove-Item $tempDir -Recurse -Force
