@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<dita>
+
+  <!-- ── Align Turning ──────────────────────────────────────────────── -->
+
+  <topic id="AlignTurning_Align_Btn">
+    <title id="AlignTurning_Align_Btn.title">Aligner pièce tournage</title>
+    <abstract id="AlignTurning_Align_Btn.abstract">
+      <shortdesc>Aligne le solide sélectionné le long de l'axe Z en utilisant son axe de révolution dominant.</shortdesc>
+      <p>Regroupe toutes les faces cylindriques et coniques par direction d'axe, sélectionne l'axe coaxial le plus long et s'aligne dessus. À utiliser comme première étape lors de la création d'un nouveau projet.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignTurning_Flip_Btn">
+    <title id="AlignTurning_Flip_Btn.title">Retourner la pièce</title>
+    <abstract id="AlignTurning_Flip_Btn.abstract">
+      <shortdesc>Effectue une rotation de 180° de l'ensemble du document autour de l'axe Y passant par l'origine monde.</shortdesc>
+      <p>À utiliser comme première étape lors de la création d'un nouveau projet si la pièce à besoin d'être retournée.</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Align Milling ──────────────────────────────────────────────── -->
+
+  <topic id="AlignMilling_Align_Btn">
+    <title id="AlignMilling_Align_Btn.title">Aligner pièce fraisage</title>
+    <abstract id="AlignMilling_Align_Btn.abstract">
+      <shortdesc>Aligne complètement le solide sélectionné pour le fraisage en un seul clic.</shortdesc>
+      <p>Effectue un alignement en 3 phases : (1) détecte le meilleur axe Z à partir des aires de faces planes et cylindriques, (2) oriente XY pour aligner le bord plat le plus long avec X, (3) déplace l'origine au centre-haut du volume englobant.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignMilling_AlignX_Btn">
+    <title id="AlignMilling_AlignX_Btn.title">Aligner sur X</title>
+    <abstract id="AlignMilling_AlignX_Btn.abstract">
+      <shortdesc>Fait pivoter le document autour de Z pour aligner l'arête ou la face sélectionnée avec l'axe X.</shortdesc>
+      <p>Sélectionnez une arête linéaire, une face plane ou un élément filaire avant de cliquer. Le document pivote de sorte que la géométrie sélectionnée soit aligné à l'axe X. Si la géometrie est déjà alignée, alors le document pivote de 90° à chaque clique.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignMilling_SetOrigin_Btn">
+    <title id="AlignMilling_SetOrigin_Btn.title">Position de l'origine</title>
+    <abstract id="AlignMilling_SetOrigin_Btn.abstract">
+      <shortdesc>Ouvre une boîte de dialogue pour placer P0 sur un coin, un milieu d'arête ou le centre du volume englobant.</shortdesc>
+      <p>Choisissez un point sur la grille XY 3×3 et un niveau Z (Z+, centre ou Z−). P0 est déplacé à la position correspondante sur le volume englobant aligné du solide sélectionné.</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Contouring Comp Checker ───────────────────────────────────── -->
+
+  <topic id="ContouringCompChecker_SplitBtn">
+    <title id="ContouringCompChecker_SplitBtn.title">Préréglage compensation</title>
+    <abstract id="ContouringCompChecker_SplitBtn.abstract">
+      <shortdesc>Applique un préréglage de compensation aux opérations de contournage sélectionnées et valide la compatibilité des entrées/sorties.</shortdesc>
+      <p>Choisissez un préréglage dans la liste déroulante : Compensation sur profil, Compensation sur centre, ou Sans compensation. L'outil vérifie que les types et distances d'entrée/sortie sont compatibles avec le mode de compensation choisi et signale les problèmes dans la fenêtre Événements.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn1">
+    <title id="ContouringCompChecker_Btn1.title">Compensation sur profil</title>
+    <abstract id="ContouringCompChecker_Btn1.abstract">
+      <shortdesc>Active la compensation "Profil" sur les opérations de contournage sélectionnées.</shortdesc>
+      <p>Active la compensation de rayon d'outil et vérifie que entrées/sorties — le type tangent est incompatible avec la compensation. Contrôle également que les distances d'entrée/sortie sont supérieures au rayon d'outil.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn2">
+    <title id="ContouringCompChecker_Btn2.title">Compensation sur centre</title>
+    <abstract id="ContouringCompChecker_Btn2.abstract">
+      <shortdesc>Active la compensation "Centre outil" sur les opérations de contournage sélectionnées.</shortdesc>
+      <p>Active la compensation sur centre d'outil et valide la compatibilité des entrées/sorties. Les problèmes détectés (type tangent, distance insuffisante) sont signalés dans la fenêtre Événements.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn3">
+    <title id="ContouringCompChecker_Btn3.title">Sans compensation</title>
+    <abstract id="ContouringCompChecker_Btn3.abstract">
+      <shortdesc>Supprime la compensation sur les opérations de contournage sélectionnées.</shortdesc>
+      <p>Définit la compensation machine à "Aucun".</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Close Open Edges ───────────────────────────────────────────── -->
+
+  <topic id="CloseAllOpenEdge_Btn">
+    <title id="CloseAllOpenEdge_Btn.title">Fermer les bords ouverts</title>
+    <abstract id="CloseAllOpenEdge_Btn.abstract">
+      <shortdesc>Définit la propriété Arête Ouverte à Faux sur tous les sous-éléments éligibles de la séquence sélectionnés.</shortdesc>
+      <p>Sélectionnez une ou plusieurs séquence avant de cliquer. Chaque sous-élément dont la propriété personnalisée Arête Ouverte est à Vrai sera fermé. Un résumé des séquences traitées et des bords fermés est écrit dans la fenêtre Événements.</p>
+    </abstract>
+  </topic>
+
+</dita>

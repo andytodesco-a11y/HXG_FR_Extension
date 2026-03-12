@@ -53,7 +53,6 @@ Public Class Main
 
         ' --- Register features here ---
 
-
         _features.Add(New AlignTurningFeature(_espritApplication))
         _features.Add(New AlignMillingFeature(_espritApplication))
         _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
@@ -64,11 +63,17 @@ Public Class Main
         '_features.Add(New AddParkingOperationFeature(_espritApplication))
         '_features.Add(New SetCollinearAxisPositionFeature(_espritApplication))
 
-
         ' Initialize each feature's ribbon UI
         For Each feature As IFeature In _features
             feature.Setup(tab)
         Next
+
+        ' Load localized tooltips after all buttons are created.
+        Dim extDir As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly().Location)
+        Dim localizedFile As String = IO.Path.Combine(extDir, $"Localization\HXG_Tooltips.{_espritApplication.Lcid}.xml")
+        Dim defaultFile As String = IO.Path.Combine(extDir, "Localization\HXG_Tooltips.xml")
+        Dim tooltipFile As String = If(IO.File.Exists(localizedFile), localizedFile, defaultFile)
+        If IO.File.Exists(tooltipFile) Then ribbon.LoadToolTipConfiguration(tooltipFile)
 
         AddHandler ribbon.OnButtonClick, AddressOf OnRibbonButtonClick
     End Sub

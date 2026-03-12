@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA Composite//EN" "ditabase.dtd">
+<dita>
+
+  <!-- ── Align Turning ──────────────────────────────────────────────── -->
+
+  <topic id="AlignTurning_Align_Btn">
+    <title id="AlignTurning_Align_Btn.title">Align Turning Part</title>
+    <abstract id="AlignTurning_Align_Btn.abstract">
+      <shortdesc>Aligns the selected solid body along the Z axis using its dominant revolution axis.</shortdesc>
+      <p>Clusters all cylindrical and conical faces by axis direction, selects the longest coaxial axis, and aligns accordingly. Use this as the first step when creating a new project.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignTurning_Flip_Btn">
+    <title id="AlignTurning_Flip_Btn.title">Flip Part</title>
+    <abstract id="AlignTurning_Flip_Btn.abstract">
+      <shortdesc>Rotates the entire document 180° around the Y axis through the world origin.</shortdesc>
+      <p>Use this as the first step when creating a new project if the part needs to be flipped.</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Align Milling ──────────────────────────────────────────────── -->
+
+  <topic id="AlignMilling_Align_Btn">
+    <title id="AlignMilling_Align_Btn.title">Align Milling Part</title>
+    <abstract id="AlignMilling_Align_Btn.abstract">
+      <shortdesc>Fully aligns the selected solid body for milling in a single click.</shortdesc>
+      <p>Performs a complete 3-phase alignment: (1) finds the best Z axis from planar and cylindrical face areas, (2) orients XY so the longest flat edge aligns with X, (3) moves the origin to the centre-top of the bounding box.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignMilling_AlignX_Btn">
+    <title id="AlignMilling_AlignX_Btn.title">Align X</title>
+    <abstract id="AlignMilling_AlignX_Btn.abstract">
+      <shortdesc>Rotates the document around Z to align the selected edge or face with the X axis.</shortdesc>
+      <p>Select a linear edge, a planar face, or a wireframe element before clicking. The document rotates so that the selected geometry aligns with the X axis. If the geometry is already aligned, the document rotates 90° on each click.</p>
+    </abstract>
+  </topic>
+
+  <topic id="AlignMilling_SetOrigin_Btn">
+    <title id="AlignMilling_SetOrigin_Btn.title">Origin Position</title>
+    <abstract id="AlignMilling_SetOrigin_Btn.abstract">
+      <shortdesc>Opens a dialog to place P0 at any corner, edge midpoint, or centre of the bounding box.</shortdesc>
+      <p>Choose a point on the 3×3 XY grid and a Z level (Z+, centre, or Z−). P0 is moved to the corresponding position on the selected solid's axis-aligned bounding box.</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Contouring Comp Checker ───────────────────────────────────── -->
+
+  <topic id="ContouringCompChecker_SplitBtn">
+    <title id="ContouringCompChecker_SplitBtn.title">Compensation Preset</title>
+    <abstract id="ContouringCompChecker_SplitBtn.abstract">
+      <shortdesc>Applies a compensation preset to the selected contouring operations and validates lead-in/out compatibility.</shortdesc>
+      <p>Choose a preset from the drop-down: Profile Compensation, Center Compensation, or No Compensation. The tool checks that lead-in/out types and distances are compatible with the chosen compensation mode and reports any issues in the Event Window.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn1">
+    <title id="ContouringCompChecker_Btn1.title">Set Profile Compensation</title>
+    <abstract id="ContouringCompChecker_Btn1.abstract">
+      <shortdesc>Sets compensation to "Profile" on the selected contouring operations.</shortdesc>
+      <p>Activates profile (cutter radius) compensation and validates lead-in/out entries — tangent types are incompatible with compensation. Also checks that lead distances exceed the tool radius.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn2">
+    <title id="ContouringCompChecker_Btn2.title">Set Center Compensation</title>
+    <abstract id="ContouringCompChecker_Btn2.abstract">
+      <shortdesc>Sets compensation to "Center" (tool center) on the selected contouring operations.</shortdesc>
+      <p>Activates tool-center compensation and validates lead-in/out compatibility. Reports any tangent entries or insufficient distances in the Event Window.</p>
+    </abstract>
+  </topic>
+
+  <topic id="ContouringCompChecker_Btn3">
+    <title id="ContouringCompChecker_Btn3.title">No Compensation</title>
+    <abstract id="ContouringCompChecker_Btn3.abstract">
+      <shortdesc>Removes compensation from the selected contouring operations.</shortdesc>
+      <p>Sets the machine compensation to None.</p>
+    </abstract>
+  </topic>
+
+  <!-- ── Close Open Edges ───────────────────────────────────────────── -->
+
+  <topic id="CloseAllOpenEdge_Btn">
+    <title id="CloseAllOpenEdge_Btn.title">Close Open Edges</title>
+    <abstract id="CloseAllOpenEdge_Btn.abstract">
+      <shortdesc>Sets the Open Edge property to False on all eligible sub-items of the selected FeatureChains.</shortdesc>
+      <p>Select one or more FeatureChains before clicking. Each sub-item whose Open Edge property is True will be closed. A summary of processed chains and closed edges is written to the Event Window.</p>
+    </abstract>
+  </topic>
+
+</dita>
