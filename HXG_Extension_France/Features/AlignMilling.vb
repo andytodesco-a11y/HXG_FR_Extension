@@ -91,10 +91,10 @@ Public Class AlignMillingFeature
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
         Dim groupPart As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_ALIGN_PART_GROUP_KEY)
-        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, LoadIcon("AlignMilling.ico"))
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, Strings.AlignMilling_ButtonLabel, True, LoadIcon("AlignMilling.ico"))
         Dim groupOptions As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_OPTIONS_GROUP_KEY)
-        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, LoadIcon("AlignX.ico"))
-        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, LoadIcon("OriginPosition.ico"))
+        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, Strings.AlignX_ButtonLabel, True, LoadIcon("AlignX.ico"))
+        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, Strings.OriginPosition_ButtonLabel, True, LoadIcon("OriginPosition.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -123,7 +123,7 @@ Public Class AlignMillingFeature
 
     Private Sub AlignPart()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("No document is open.") : Return
+        If doc Is Nothing Then LogWarning(Strings.Msg_NoDocument) : Return
 
         Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
         If body Is Nothing Then Return
@@ -133,7 +133,7 @@ Public Class AlignMillingFeature
         ' ── Phase 1 : collect face descriptors ────────────────────────────────
         Dim allFaces As List(Of FaceInfo) = CollectFaceInfo(faces)
         If allFaces.Count = 0 Then
-            LogWarning("No usable planar or cylindrical faces found.")
+            LogWarning(Strings.AlignMilling_NoFaces)
             Return
         End If
 
@@ -143,7 +143,7 @@ Public Class AlignMillingFeature
         ' ── Phase 3 : pick best Z cluster ─────────────────────────────────────
         Dim best As AxisCluster = PickBestCluster(clusters, allFaces)
         If best Is Nothing Then
-            LogWarning("Could not determine a dominant alignment axis.")
+            LogWarning(Strings.AlignMilling_NoDominantAxis)
             Return
         End If
 
@@ -157,7 +157,7 @@ Public Class AlignMillingFeature
             doc.AlignAlongAxis("Z")
         Else
             ' Fallback: no planar face available — rotate directly.
-            LogInfo("No planar top face found; using direct axis rotation.")
+            LogInfo(Strings.AlignMilling_NoTopFace)
             AlignAxisToZ(doc, best.RefDirection)
         End If
 
@@ -167,7 +167,7 @@ Public Class AlignMillingFeature
         ' ── Phase 7 : place P0 at top ──────────────────────────────────────────
         MoveP0ToTopZ(doc, body)
 
-        LogInfo("Milling part aligned.")
+        LogInfo(Strings.AlignMilling_Done)
         doc.Refresh()
     End Sub
 
@@ -493,7 +493,7 @@ Public Class AlignMillingFeature
         Next
 
         If pts.Count < 2 Then
-            LogInfo("Orient XY: insufficient vertex data — XY orientation unchanged.")
+            LogInfo(Strings.AlignMilling_OrientXYNoData)
             Return
         End If
 
@@ -544,12 +544,12 @@ Public Class AlignMillingFeature
         ' ── Step 5 : apply rotation ────────────────────────────────────────────
         Const ANGLE_TOL As Double = 0.25 * Math.PI / 180.0   ' skip rotations < 0.25°
         If Math.Abs(bestAngle) < ANGLE_TOL Then
-            LogInfo("Orient XY: part already optimally oriented — no XY rotation needed.")
+            LogInfo(Strings.AlignMilling_OrientXYOptimal)
             Return
         End If
 
         RotateAllDocumentObjects(doc, 0.0, 0.0, 1.0, -bestAngle)
-        LogInfo($"Orient XY: rotated {-bestAngle * 180.0 / Math.PI:F2}° around Z (min bbox).")
+        LogInfo(String.Format(Strings.AlignMilling_OrientXYRotated, -bestAngle * 180.0 / Math.PI))
     End Sub
 
     ''' <summary>
@@ -622,7 +622,7 @@ Public Class AlignMillingFeature
                 End Try
             End Try
         Catch ex As Exception
-            LogWarning($"Could not move P0: {ex.Message}")
+            LogWarning(String.Format(Strings.AlignMilling_P0Error, ex.Message))
         End Try
     End Sub
 
@@ -638,7 +638,7 @@ Public Class AlignMillingFeature
     ''' </summary>
     Private Sub SetBoundingBoxOrigin()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("No document is open.") : Return
+        If doc Is Nothing Then LogWarning(Strings.Msg_NoDocument) : Return
 
         Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
         If body Is Nothing Then Return
@@ -666,10 +666,10 @@ Public Class AlignMillingFeature
                     End Try
                 End Try
 
-                LogInfo($"Origin set to ({targetX:F3}, {targetY:F3}, {targetZ:F3}).")
+                LogInfo(String.Format(Strings.AlignMilling_OriginSet, targetX, targetY, targetZ))
                 doc.Refresh()
             Catch ex As Exception
-                LogWarning($"Could not set origin: {ex.Message}")
+                LogWarning(String.Format(Strings.AlignMilling_OriginError, ex.Message))
             End Try
         End Using
     End Sub
@@ -727,7 +727,7 @@ Public Class AlignMillingFeature
                 End Try
             End If
 
-            Me.Text = "Set Bounding Box Origin"
+            Me.Text = Strings.BBoxDlg_Title
             Me.FormBorderStyle = FormBorderStyle.FixedDialog
             Me.StartPosition = FormStartPosition.CenterScreen
             Me.MaximizeBox = False
@@ -742,7 +742,7 @@ Public Class AlignMillingFeature
 
         Private Sub BuildXYGroup()
             Dim gb As New GroupBox()
-            gb.Text = "XY Position"
+            gb.Text = Strings.BBoxDlg_XYPosition
             gb.Location = New Point(10, 10)
             gb.Size = New Size(245, 215)
             Me.Controls.Add(gb)
@@ -806,12 +806,12 @@ Public Class AlignMillingFeature
 
         Private Sub BuildZGroup()
             Dim gb As New GroupBox()
-            gb.Text = "Z Position"
+            gb.Text = Strings.BBoxDlg_ZPosition
             gb.Location = New Point(268, 10)
             gb.Size = New Size(118, 120)
             Me.Controls.Add(gb)
 
-            Dim labels() As String = {"Z+", "Z Center", "Z−"}
+            Dim labels() As String = {Strings.BBoxDlg_ZPlus, Strings.BBoxDlg_ZCenter, Strings.BBoxDlg_ZMinus}
             For i As Integer = 0 To 2
                 Dim rb As New RadioButton()
                 rb.Text = labels(i)
@@ -827,7 +827,7 @@ Public Class AlignMillingFeature
 
         Private Sub BuildButtons()
             Dim btnOK As New Button()
-            btnOK.Text = "OK"
+            btnOK.Text = Strings.BBoxDlg_OK
             btnOK.Location = New Point(228, 244)
             btnOK.Size = New Size(75, 26)
             Me.Controls.Add(btnOK)
@@ -835,7 +835,7 @@ Public Class AlignMillingFeature
             AddHandler btnOK.Click, AddressOf OnOKClick
 
             Dim btnCancel As New Button()
-            btnCancel.Text = "Cancel"
+            btnCancel.Text = Strings.BBoxDlg_Cancel
             btnCancel.DialogResult = DialogResult.Cancel
             btnCancel.Location = New Point(313, 244)
             btnCancel.Size = New Size(75, 26)

@@ -135,6 +135,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Localization\Strings.Designer.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Strings.resx" />
+    <EmbeddedResource Include="Localization\Strings.fr.resx">
+      <Culture>fr</Culture>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Features\AlignMilling.vb" />
     <Compile Include="Features\AlignTurning.vb" />
     <Compile Include="Features\ContouringCompChecker.vb" />

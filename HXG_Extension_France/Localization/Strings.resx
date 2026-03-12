@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ── General ─────────────────────────────────────────────────────────── -->
+  <data name="Msg_NoDocument" xml:space="preserve">
+    <value>No document is open.</value>
+  </data>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <data name="Tab_Title" xml:space="preserve">
+    <value>HXG Extension France</value>
+  </data>
+
+  <!-- ── CloseAllOpenEdge ────────────────────────────────────────────────── -->
+  <data name="CloseEdge_GroupLabel" xml:space="preserve">
+    <value>Edges</value>
+  </data>
+  <data name="CloseEdge_ButtonLabel" xml:space="preserve">
+    <value>Close Open Edges</value>
+  </data>
+  <data name="CloseEdge_NoSelection" xml:space="preserve">
+    <value>No item selected. Please select features before running the extension.</value>
+  </data>
+  <data name="CloseEdge_NoFeatureChain" xml:space="preserve">
+    <value>No FeatureChain found in the selection.</value>
+  </data>
+  <data name="CloseEdge_Done" xml:space="preserve">
+    <value>Done: {0} feature(s) processed, {1} edge(s) closed.</value>
+  </data>
+  <data name="CloseEdge_Skipped" xml:space="preserve">
+    <value> ({0} sub-item(s) without OpenEdge property were skipped.)</value>
+  </data>
+
+  <!-- ── AlignTurning ────────────────────────────────────────────────────── -->
+  <data name="AlignPart_GroupLabel" xml:space="preserve">
+    <value>Align Part</value>
+  </data>
+  <data name="AlignOptions_GroupLabel" xml:space="preserve">
+    <value>Align Options</value>
+  </data>
+  <data name="AlignTurning_ButtonLabel" xml:space="preserve">
+    <value>Align Turning Part</value>
+  </data>
+  <data name="AlignTurning_FlipButtonLabel" xml:space="preserve">
+    <value>Flip Part</value>
+  </data>
+  <data name="AlignTurning_NoAxis" xml:space="preserve">
+    <value>No revolution axis found. Ensure a turning part is selected.</value>
+  </data>
+  <data name="AlignTurning_Done" xml:space="preserve">
+    <value>Turning part aligned along Z axis.</value>
+  </data>
+  <data name="AlignTurning_FlipDone" xml:space="preserve">
+    <value>Part flipped 180° around Y axis through center of gravity.</value>
+  </data>
+
+  <!-- ── AlignMilling ────────────────────────────────────────────────────── -->
+  <data name="AlignMilling_ButtonLabel" xml:space="preserve">
+    <value>Align Milling Part</value>
+  </data>
+  <data name="AlignX_ButtonLabel" xml:space="preserve">
+    <value>Align X</value>
+  </data>
+  <data name="OriginPosition_ButtonLabel" xml:space="preserve">
+    <value>Origin Position</value>
+  </data>
+  <data name="AlignMilling_NoFaces" xml:space="preserve">
+    <value>No usable planar or cylindrical faces found.</value>
+  </data>
+  <data name="AlignMilling_NoDominantAxis" xml:space="preserve">
+    <value>Could not determine a dominant alignment axis.</value>
+  </data>
+  <data name="AlignMilling_NoTopFace" xml:space="preserve">
+    <value>No planar top face found; using direct axis rotation.</value>
+  </data>
+  <data name="AlignMilling_Done" xml:space="preserve">
+    <value>Milling part aligned.</value>
+  </data>
+  <data name="AlignMilling_OrientXYNoData" xml:space="preserve">
+    <value>Orient XY: insufficient vertex data — XY orientation unchanged.</value>
+  </data>
+  <data name="AlignMilling_OrientXYOptimal" xml:space="preserve">
+    <value>Orient XY: part already optimally oriented — no XY rotation needed.</value>
+  </data>
+  <data name="AlignMilling_OrientXYRotated" xml:space="preserve">
+    <value>Orient XY: rotated {0:F2}° around Z (min bbox).</value>
+  </data>
+  <data name="AlignMilling_P0Error" xml:space="preserve">
+    <value>Could not move P0: {0}</value>
+  </data>
+  <data name="AlignMilling_OriginSet" xml:space="preserve">
+    <value>Origin set to ({0:F3}, {1:F3}, {2:F3}).</value>
+  </data>
+  <data name="AlignMilling_OriginError" xml:space="preserve">
+    <value>Could not set origin: {0}</value>
+  </data>
+
+  <!-- ── BoundingBoxOriginDialog ──────────────────────────────────────────── -->
+  <data name="BBoxDlg_Title" xml:space="preserve">
+    <value>Set Bounding Box Origin</value>
+  </data>
+  <data name="BBoxDlg_XYPosition" xml:space="preserve">
+    <value>XY Position</value>
+  </data>
+  <data name="BBoxDlg_ZPosition" xml:space="preserve">
+    <value>Z Position</value>
+  </data>
+  <data name="BBoxDlg_ZPlus" xml:space="preserve">
+    <value>Z+</value>
+  </data>
+  <data name="BBoxDlg_ZCenter" xml:space="preserve">
+    <value>Z Center</value>
+  </data>
+  <data name="BBoxDlg_ZMinus" xml:space="preserve">
+    <value>Z−</value>
+  </data>
+  <data name="BBoxDlg_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="BBoxDlg_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+
+  <!-- ── ContouringCompChecker ────────────────────────────────────────────── -->
+  <data name="CompChecker_GroupLabel" xml:space="preserve">
+    <value>Comp Check</value>
+  </data>
+  <data name="CompChecker_ProfileBtnLabel" xml:space="preserve">
+    <value>Set Profile Compensation</value>
+  </data>
+  <data name="CompChecker_CenterBtnLabel" xml:space="preserve">
+    <value>Set Center Compensation</value>
+  </data>
+  <data name="CompChecker_NoCompBtnLabel" xml:space="preserve">
+    <value>No Compensation</value>
+  </data>
+  <data name="CompChecker_LeadIn" xml:space="preserve">
+    <value>Lead-in</value>
+  </data>
+  <data name="CompChecker_LeadOut" xml:space="preserve">
+    <value>Lead-out</value>
+  </data>
+  <data name="CompChecker_FinishLeadInOut" xml:space="preserve">
+    <value>Finish Lead-in/out</value>
+  </data>
+  <data name="CompChecker_OpenPocketLeadInOut" xml:space="preserve">
+    <value>Open Pocket Lead-in/out</value>
+  </data>
+  <data name="CompChecker_TangentLeadIn" xml:space="preserve">
+    <value>{0}: Tangent type is incompatible with compensation — a perpendicular lead-in is required.</value>
+  </data>
+  <data name="CompChecker_TangentLeadOut" xml:space="preserve">
+    <value>{0}: Tangent type is incompatible with compensation — a perpendicular lead-out is required.</value>
+  </data>
+  <data name="CompChecker_DistanceTooSmall" xml:space="preserve">
+    <value>{0}: {1} = {2} must be greater than OffsetRegisterValue ({3}).</value>
+  </data>
+
+  <!-- ── ExtensionUtilities / AlignX ──────────────────────────────────────── -->
+  <data name="Selection_NoElement" xml:space="preserve">
+    <value>No element selected. Please select a solid, face, loop, or edge.</value>
+  </data>
+  <data name="Selection_MultipleElements" xml:space="preserve">
+    <value>Multiple elements selected. Please select a single element only.</value>
+  </data>
+  <data name="Selection_NotASolid" xml:space="preserve">
+    <value>The selected element is not a solid, face, loop, or edge.</value>
+  </data>
+  <data name="AlignX_NoSelection" xml:space="preserve">
+    <value>Align X: no selection. Select a point, a line/arc/circle edge, or a planar/cylindrical face.</value>
+  </data>
+  <data name="AlignX_UnsupportedEdge" xml:space="preserve">
+    <value>Align X: unsupported edge type. Select a line, arc, or circle edge.</value>
+  </data>
+  <data name="AlignX_NoAngle" xml:space="preserve">
+    <value>Align X: could not determine a reference angle from the selection.</value>
+  </data>
+  <data name="AlignX_Rotated" xml:space="preserve">
+    <value>Align X: rotated {0:F2}° around Z.</value>
+  </data>
+
+</root>

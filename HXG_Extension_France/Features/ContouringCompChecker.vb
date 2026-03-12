@@ -40,12 +40,12 @@ Public Class ContouringCompCheckerFeature
             Dim targetTab As IRibbonTab = ribbon.Tabs.Item(TARGET_TAB_KEY)
             If targetTab.Groups.Contains(RIBBON_GROUP_KEY) Then Exit Sub
 
-            Dim group As IRibbonGroup = targetTab.Groups.Add(RIBBON_GROUP_KEY, "Comp Check")
+            Dim group As IRibbonGroup = targetTab.Groups.Add(RIBBON_GROUP_KEY, Strings.CompChecker_GroupLabel)
 
             Dim buttons As New List(Of IRibbonButtonInfo) From {
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN1_KEY, .Caption = "Set Profile Compensation", .Icon = LoadIcon("ProfilComp.ico")},
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN2_KEY, .Caption = "Set Center Compensation", .Icon = LoadIcon("ToolComp.ico")},
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN3_KEY, .Caption = "No Compensation", .Icon = LoadIcon("NoComp.ico")}
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN1_KEY, .Caption = Strings.CompChecker_ProfileBtnLabel, .Icon = LoadIcon("ProfilComp.ico")},
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN2_KEY, .Caption = Strings.CompChecker_CenterBtnLabel, .Icon = LoadIcon("ToolComp.ico")},
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN3_KEY, .Caption = Strings.CompChecker_NoCompBtnLabel, .Icon = LoadIcon("NoComp.ico")}
             }
             _splitButton = group.Items.AddSplitButton(RIBBON_SPLITBTN_KEY, True, buttons)
             _splitButton.Visible = False
@@ -215,7 +215,7 @@ Public Class ContouringCompCheckerFeature
         Dim normalParamName As String = If(isLeadIn, "NormalLeadInDistance", "NormalLeadOutDistance")
         Dim xOffsetParamName As String = If(isLeadIn, "XOffsetLeadInDistance", "XOffsetLeadOutDistance")
         Dim yOffsetParamName As String = If(isLeadIn, "YOffsetLeadInDistance", "YOffsetLeadOutDistance")
-        Dim dirLabel As String = If(isLeadIn, "Lead-in", "Lead-out")
+        Dim dirLabel As String = If(isLeadIn, Strings.CompChecker_LeadIn, Strings.CompChecker_LeadOut)
         Try
             Dim typeParam As EspritTechnology.IParameter = _currentTechnology.FindParameter(typeParamName)
             If typeParam Is Nothing OrElse typeParam.Hidden Then Exit Sub
@@ -224,7 +224,7 @@ Public Class ContouringCompCheckerFeature
             If isLeadIn Then
                 If typeValue = CInt(EspritConstants.espMillLeadinType.espMillLeadinTangent) Then
                     _app.EventWindow.AddMessage(EspritConstants.espMessageType.espMessageTypeWarning, SOURCE,
-                        $"{dirLabel}: Tangent type is incompatible with compensation — a perpendicular lead-in is required.")
+                        String.Format(Strings.CompChecker_TangentLeadIn, dirLabel))
                     Exit Sub
                 End If
                 Select Case typeValue
@@ -246,7 +246,7 @@ Public Class ContouringCompCheckerFeature
             Else
                 If typeValue = CInt(EspritConstants.espMillLeadoutType.espMillLeadoutTangent) Then
                     _app.EventWindow.AddMessage(EspritConstants.espMessageType.espMessageTypeWarning, SOURCE,
-                        $"{dirLabel}: Tangent type is incompatible with compensation — a perpendicular lead-out is required.")
+                        String.Format(Strings.CompChecker_TangentLeadOut, dirLabel))
                     Exit Sub
                 End If
                 Select Case typeValue
@@ -280,7 +280,7 @@ Public Class ContouringCompCheckerFeature
                 _app.EventWindow.AddMessage(
                     EspritConstants.espMessageType.espMessageTypeWarning,
                     SOURCE,
-                    $"{dirLabel}: {CStr(param.Caption)} = {value} must be greater than OffsetRegisterValue ({offsetRegister}).")
+                    String.Format(Strings.CompChecker_DistanceTooSmall, dirLabel, CStr(param.Caption), value, offsetRegister))
             End If
         Catch
             ' Parameter not present in this operation type — skip
@@ -288,7 +288,7 @@ Public Class ContouringCompCheckerFeature
     End Sub
 
     Private Sub ValidateFinishLeadInOut(offsetRegister As Double)
-        Const dirLabel As String = "Finish Lead-in/out"
+        Dim dirLabel As String = Strings.CompChecker_FinishLeadInOut
         Try
             Dim typeParam As EspritTechnology.IParameter = _currentTechnology.FindParameter("FinishLeadInOutType")
             If typeParam Is Nothing OrElse typeParam.Hidden Then Exit Sub
@@ -305,14 +305,14 @@ Public Class ContouringCompCheckerFeature
     End Sub
 
     Private Sub ValidateOpenPocketLeadInOut(offsetRegister As Double)
-        Const dirLabel As String = "Open Pocket Lead-in/out"
+        Dim dirLabel As String = Strings.CompChecker_OpenPocketLeadInOut
         Try
             Dim typeParam As EspritTechnology.IParameter = _currentTechnology.FindParameter("OpenPocketLeadInOutType")
             If typeParam Is Nothing OrElse typeParam.Hidden Then Exit Sub
             Dim typeValue As Integer = CInt(typeParam.Value)
             If typeValue = CInt(EspritConstants.espOpenPocketLeadInOutType.espOpenPocketLeadInOutTangent) Then
                 _app.EventWindow.AddMessage(EspritConstants.espMessageType.espMessageTypeWarning, SOURCE,
-                    $"{dirLabel}: Tangent type is incompatible with compensation — a perpendicular lead-in/out is required.")
+                    String.Format(Strings.CompChecker_TangentLeadIn, dirLabel))
                 Exit Sub
             End If
             Select Case typeValue

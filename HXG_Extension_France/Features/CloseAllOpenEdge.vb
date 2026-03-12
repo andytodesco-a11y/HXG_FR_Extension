@@ -18,8 +18,8 @@ Public Class CloseAllOpenEdgeFeature
     End Sub
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
-        Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Edges")
-        group.Items.AddButton(RIBBON_BUTTON_KEY, "Close Open Edges", True, LoadIcon("CloseFeatureEdge.ico"))
+        Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, Strings.CloseEdge_GroupLabel)
+        group.Items.AddButton(RIBBON_BUTTON_KEY, Strings.CloseEdge_ButtonLabel, True, LoadIcon("CloseFeatureEdge.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -42,7 +42,7 @@ Public Class CloseAllOpenEdgeFeature
             _app.EventWindow.AddMessage(
                 EspritConstants.espMessageType.espMessageTypeWarning,
                 "CloseAllOpenEdge",
-                "No document is open.")
+                Strings.Msg_NoDocument)
             Return
         End If
 
@@ -50,7 +50,7 @@ Public Class CloseAllOpenEdgeFeature
             _app.EventWindow.AddMessage(
                 EspritConstants.espMessageType.espMessageTypeWarning,
                 "CloseAllOpenEdge",
-                "No item selected. Please select features before running the extension.")
+                Strings.CloseEdge_NoSelection)
             Return
         End If
 
@@ -93,12 +93,12 @@ Public Class CloseAllOpenEdgeFeature
             _app.EventWindow.AddMessage(
                 EspritConstants.espMessageType.espMessageTypeWarning,
                 "CloseAllOpenEdge",
-                "No FeatureChain found in the selection.")
+                Strings.CloseEdge_NoFeatureChain)
         Else
 
-            Dim message As String = $"Done: {featureCount} feature(s) processed, {closedCount} edge(s) closed."
+            Dim message As String = String.Format(Strings.CloseEdge_Done, featureCount, closedCount)
             If errorCount > 0 Then
-                message &= $" ({errorCount} sub-item(s) without OpenEdge property were skipped.)"
+                message &= String.Format(Strings.CloseEdge_Skipped, errorCount)
             End If
             _app.EventWindow.AddMessage(
                 EspritConstants.espMessageType.espMessageTypeInformation,

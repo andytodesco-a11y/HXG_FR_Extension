@@ -28,6 +28,7 @@ Public Class Main
     Public Sub Connect(app As Object) Implements IExtension.Connect
         _espritApplication = DirectCast(app, ESPRIT.Application)
         ExtensionUtilities.Initialize(_espritApplication)
+        Strings.SetCulture(CInt(_espritApplication.Lcid))
         SetupRibbon()
     End Sub
 
@@ -48,7 +49,7 @@ Public Class Main
 
     Private Sub SetupRibbon()
         Dim ribbon As IRibbon = _espritApplication.Ribbon
-        Dim tab As IRibbonTab = ribbon.Tabs.Add(RIBBON_TAB_KEY, "HXG Extension France")
+        Dim tab As IRibbonTab = ribbon.Tabs.Add(RIBBON_TAB_KEY, Strings.Tab_Title)
 
         ' --- Register features here ---
 
