@@ -70,10 +70,13 @@ Public Class Main
 
         ' Load localized tooltips after all buttons are created.
         Dim extDir As String = IO.Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly().Location)
-        Dim localizedFile As String = IO.Path.Combine(extDir, $"Localization\HXG_Tooltips.{_espritApplication.Lcid}.xml")
-        Dim defaultFile As String = IO.Path.Combine(extDir, "Localization\HXG_Tooltips.xml")
-        Dim tooltipFile As String = If(IO.File.Exists(localizedFile), localizedFile, defaultFile)
-        If IO.File.Exists(tooltipFile) Then ribbon.LoadToolTipConfiguration(tooltipFile)
+        Dim localizedFile As String = IO.Path.Combine(extDir, "Localization", $"HXG_Tooltips.{_espritApplication.Lcid}.xml")
+        Dim defaultFile As String = IO.Path.Combine(extDir, "Localization", "HXG_Tooltips.xml")
+        If IO.File.Exists(localizedFile) Then
+            ribbon.LoadToolTipConfiguration(localizedFile)
+        ElseIf IO.File.Exists(defaultFile) Then
+            ribbon.LoadToolTipConfiguration(defaultFile)
+        End If
 
         AddHandler ribbon.OnButtonClick, AddressOf OnRibbonButtonClick
     End Sub
