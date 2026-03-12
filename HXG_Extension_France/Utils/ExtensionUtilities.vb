@@ -557,7 +557,7 @@ Public Module ExtensionUtilities
         Try
             Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
                 System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, iconFileName)
+            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "Icones", iconFileName)
             If System.IO.File.Exists(iconPath) Then
                 Return New System.Drawing.Icon(iconPath)
             End If

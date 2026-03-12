@@ -19,20 +19,7 @@ Public Class CloseAllOpenEdgeFeature
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
         Dim group As IRibbonGroup = tab.Groups.Add(RIBBON_GROUP_KEY, "Edges")
-
-        Dim icon As System.Drawing.Icon = Nothing
-        Try
-            Dim assemblyDir As String = System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().Location)
-            Dim iconPath As String = System.IO.Path.Combine(assemblyDir, "HXG_Extension_France_Large.ico")
-            If System.IO.File.Exists(iconPath) Then
-                icon = New System.Drawing.Icon(iconPath)
-            End If
-        Catch
-            ' Continue without icon if loading fails
-        End Try
-
-        group.Items.AddButton(RIBBON_BUTTON_KEY, "Close Open Edges", True, icon)
+        group.Items.AddButton(RIBBON_BUTTON_KEY, "Close Open Edges", True, LoadIcon("CloseFeatureEdge.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick

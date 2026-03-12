@@ -91,10 +91,10 @@ Public Class AlignMillingFeature
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
         Dim groupPart As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_ALIGN_PART_GROUP_KEY)
-        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, LoadIcon("HXG_Extension_France_Large.ico"))
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Milling Part", True, LoadIcon("AlignMilling.ico"))
         Dim groupOptions As IRibbonGroup = tab.Groups.Item(AlignTurningFeature.RIBBON_OPTIONS_GROUP_KEY)
-        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, LoadIcon("HXG_Extension_France_Large.ico"))
-        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, LoadIcon("HXG_Extension_France_Large.ico"))
+        groupOptions.Items.AddButton(BTN_ALIGN_X_KEY, "Align X", True, LoadIcon("AlignX.ico"))
+        groupOptions.Items.AddButton(BTN_ORIGIN_KEY, "Origin Position", True, LoadIcon("OriginPosition.ico"))
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick

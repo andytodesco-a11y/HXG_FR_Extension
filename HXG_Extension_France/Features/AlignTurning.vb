@@ -89,7 +89,8 @@ Public Class AlignTurningFeature
         Dim groupPart As IRibbonGroup = tab.Groups.Add(RIBBON_ALIGN_PART_GROUP_KEY, "Align Part")
         groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Turning Part", True, LoadIcon("AlignTurning.ico"))
         Dim groupOptions As IRibbonGroup = tab.Groups.Add(RIBBON_OPTIONS_GROUP_KEY, "Align Options")
-        Dim Button As IRibbonItem = groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, LoadIcon("HXG_Extension_France_Large.ico"))
+        Dim Button As IRibbonItem = groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, LoadIcon("FlipPart.ico"))
+
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick

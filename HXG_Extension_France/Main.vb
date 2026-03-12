@@ -19,7 +19,7 @@ Public Class Main
 
     Public ReadOnly Property Description() As String = "HXG Extension France - ESPRIT EDGE productivity tools" Implements IBaseExtension.Description
     Public ReadOnly Property Name() As String = "HXG_Extension_France" Implements IBaseExtension.Name
-    Public ReadOnly Property Publisher() As String = "ESPRIT EDGE" Implements IBaseExtension.Publisher
+    Public ReadOnly Property Publisher() As String = "Hexagon PS France - Todesco Andy" Implements IBaseExtension.Publisher
     Public ReadOnly Property Url() As String = "http://www.espritcam.com" Implements IBaseExtension.Url
 
     Private _espritApplication As ESPRIT.Application
@@ -52,9 +52,11 @@ Public Class Main
 
         ' --- Register features here ---
 
-        _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
+
         _features.Add(New AlignTurningFeature(_espritApplication))
         _features.Add(New AlignMillingFeature(_espritApplication))
+        _features.Add(New CloseAllOpenEdgeFeature(_espritApplication))
+        _features.Add(New ContouringCompCheckerFeature(_espritApplication))
 
         '_features.Add(New DetectAndAlignPartFeature(_espritApplication))
         '_features.Add(New DebugExploration(_espritApplication))
