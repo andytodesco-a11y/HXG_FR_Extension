@@ -43,9 +43,9 @@ Public Class ContouringCompCheckerFeature
             Dim group As IRibbonGroup = targetTab.Groups.Add(RIBBON_GROUP_KEY, "Comp Check")
 
             Dim buttons As New List(Of IRibbonButtonInfo) From {
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN1_KEY, .Caption = "Set Profile Compensation", .Icon = LoadIcon("PlaceHolder.ico")},
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN2_KEY, .Caption = "Set Center Compensation", .Icon = LoadIcon("PlaceHolder.ico")},
-                New RibbonButtonInfo() With {.Key = RIBBON_BTN3_KEY, .Caption = "No Compensation", .Icon = LoadIcon("PlaceHolder.ico")}
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN1_KEY, .Caption = "Set Profile Compensation", .Icon = LoadIcon("ProfilComp.ico")},
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN2_KEY, .Caption = "Set Center Compensation", .Icon = LoadIcon("ToolComp.ico")},
+                New RibbonButtonInfo() With {.Key = RIBBON_BTN3_KEY, .Caption = "No Compensation", .Icon = LoadIcon("NoComp.ico")}
             }
             _splitButton = group.Items.AddSplitButton(RIBBON_SPLITBTN_KEY, True, buttons)
             _splitButton.Visible = False
