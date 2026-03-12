@@ -30,11 +30,11 @@ Public Module ExtensionUtilities
     ''' </summary>
     Public Function GetSelectedSolidBody(doc As ESPRIT.Document) As EspritSolids.ISolidBody
         If doc.Group.Count = 0 Then
-            LogWarning(SELECTION_SOURCE, "No element selected. Please select a solid, face, loop, or edge.")
+            LogWarning(SELECTION_SOURCE, Strings.Selection_NoElement)
             Return Nothing
         End If
         If doc.Group.Count > 1 Then
-            LogWarning(SELECTION_SOURCE, "Multiple elements selected. Please select a single element only.")
+            LogWarning(SELECTION_SOURCE, Strings.Selection_MultipleElements)
             Return Nothing
         End If
         Dim item As Object = doc.Group.Item(1)
@@ -43,7 +43,7 @@ Public Module ExtensionUtilities
             If body IsNot Nothing Then Return body
         Catch
         End Try
-        LogWarning(SELECTION_SOURCE, "The selected element is not a solid, face, loop, or edge.")
+        LogWarning(SELECTION_SOURCE, Strings.Selection_NotASolid)
         Return Nothing
     End Function
 
@@ -504,10 +504,10 @@ Public Module ExtensionUtilities
     ''' </summary>
     Public Sub AlignX()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("AlignX", "No document is open.") : Return
+        If doc Is Nothing Then LogWarning("AlignX", Strings.Msg_NoDocument) : Return
 
         If doc.Group.Count = 0 Then
-            LogWarning("AlignX", "Align X: no selection. Select a point, a line/arc/circle edge, or a planar/cylindrical face.")
+            LogWarning("AlignX", Strings.AlignX_NoSelection)
             Return
         End If
 
@@ -519,7 +519,7 @@ Public Module ExtensionUtilities
             ' For edges, validate geometry type before computing the angle.
             If TypeOf item Is EspritSolids.ISolidEdge Then
                 If Not IsAlignXEdgeSupported(CType(item, EspritSolids.ISolidEdge)) Then
-                    LogWarning("AlignX", "Align X: unsupported edge type. Select a line, arc, or circle edge.")
+                    LogWarning("AlignX", Strings.AlignX_UnsupportedEdge)
                     Return
                 End If
             End If
@@ -529,7 +529,7 @@ Public Module ExtensionUtilities
         Next
 
         If Double.IsNaN(refAngle) Then
-            LogWarning("AlignX", "Align X: could not determine a reference angle from the selection.")
+            LogWarning("AlignX", Strings.AlignX_NoAngle)
             Return
         End If
 
@@ -543,7 +543,7 @@ Public Module ExtensionUtilities
         End If
 
         RotateAllDocumentObjects(doc, 0.0, 0.0, 1.0, rotAngle)
-        LogInfo("AlignX", $"Align X: rotated {rotAngle * 180.0 / Math.PI:F2}° around Z.")
+        LogInfo("AlignX", String.Format(Strings.AlignX_Rotated, rotAngle * 180.0 / Math.PI))
         doc.Refresh()
     End Sub
 

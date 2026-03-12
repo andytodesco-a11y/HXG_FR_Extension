@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Msg_NoDocument" xml:space="preserve">
+    <value>Aucun document ouvert.</value>
+  </data>
+  <data name="Tab_Title" xml:space="preserve">
+    <value>HXG Extension France</value>
+  </data>
+  <data name="CloseEdge_GroupLabel" xml:space="preserve">
+    <value>Arêtes</value>
+  </data>
+  <data name="CloseEdge_ButtonLabel" xml:space="preserve">
+    <value>Fermer les arêtes ouvertes</value>
+  </data>
+  <data name="CloseEdge_NoSelection" xml:space="preserve">
+    <value>Aucun élément sélectionné. Veuillez sélectionner des entités avant d'exécuter l'extension.</value>
+  </data>
+  <data name="CloseEdge_NoFeatureChain" xml:space="preserve">
+    <value>Aucune séquence trouvé dans la sélection.</value>
+  </data>
+  <data name="CloseEdge_Done" xml:space="preserve">
+    <value>Terminé : {0} entité(s) traitée(s), {1} arête(s) fermée(s).</value>
+  </data>
+  <data name="CloseEdge_Skipped" xml:space="preserve">
+    <value> ({0} sous-élément(s) sans propriété Arête Ouverte ignoré(s).)</value>
+  </data>
+  <data name="AlignPart_GroupLabel" xml:space="preserve">
+    <value>Aligner la pièce</value>
+  </data>
+  <data name="AlignOptions_GroupLabel" xml:space="preserve">
+    <value>Options d'alignement</value>
+  </data>
+  <data name="AlignTurning_ButtonLabel" xml:space="preserve">
+    <value>Aligner pièce tournage</value>
+  </data>
+  <data name="AlignTurning_FlipButtonLabel" xml:space="preserve">
+    <value>Retourner la pièce</value>
+  </data>
+  <data name="AlignTurning_NoAxis" xml:space="preserve">
+    <value>Aucun axe de révolution trouvé. Assurez-vous qu'une pièce de tournage est sélectionnée.</value>
+  </data>
+  <data name="AlignTurning_Done" xml:space="preserve">
+    <value>Pièce de tournage alignée sur l'axe Z.</value>
+  </data>
+  <data name="AlignTurning_FlipDone" xml:space="preserve">
+    <value>Pièce retournée à 180° autour de l'axe Y.</value>
+  </data>
+  <data name="AlignMilling_ButtonLabel" xml:space="preserve">
+    <value>Aligner pièce fraisage</value>
+  </data>
+  <data name="AlignX_ButtonLabel" xml:space="preserve">
+    <value>Aligner X</value>
+  </data>
+  <data name="OriginPosition_ButtonLabel" xml:space="preserve">
+    <value>Position origine</value>
+  </data>
+  <data name="AlignMilling_NoFaces" xml:space="preserve">
+    <value>Aucune face plane ou cylindrique utilisable trouvée.</value>
+  </data>
+  <data name="AlignMilling_NoDominantAxis" xml:space="preserve">
+    <value>Impossible de déterminer un axe d'alignement dominant.</value>
+  </data>
+  <data name="AlignMilling_NoTopFace" xml:space="preserve">
+    <value>Aucune face supérieure plane trouvée ; rotation directe de l'axe utilisée.</value>
+  </data>
+  <data name="AlignMilling_Done" xml:space="preserve">
+    <value>Pièce de fraisage alignée.</value>
+  </data>
+  <data name="AlignMilling_OrientXYNoData" xml:space="preserve">
+    <value>Orient XY : données de vertex insuffisantes — orientation XY inchangée.</value>
+  </data>
+  <data name="AlignMilling_OrientXYOptimal" xml:space="preserve">
+    <value>Orient XY : pièce déjà orientée de façon optimale — aucune rotation XY nécessaire.</value>
+  </data>
+  <data name="AlignMilling_OrientXYRotated" xml:space="preserve">
+    <value>Orient XY : rotation de {0:F2}° autour de Z (boîte englobante minimale).</value>
+  </data>
+  <data name="AlignMilling_P0Error" xml:space="preserve">
+    <value>Impossible de déplacer P0 : {0}</value>
+  </data>
+  <data name="AlignMilling_OriginSet" xml:space="preserve">
+    <value>Origine définie à ({0:F3}, {1:F3}, {2:F3}).</value>
+  </data>
+  <data name="AlignMilling_OriginError" xml:space="preserve">
+    <value>Impossible de définir l'origine : {0}</value>
+  </data>
+  <data name="BBoxDlg_Title" xml:space="preserve">
+    <value>Définir l'origine de la boîte englobante</value>
+  </data>
+  <data name="BBoxDlg_XYPosition" xml:space="preserve">
+    <value>Position XY</value>
+  </data>
+  <data name="BBoxDlg_ZPosition" xml:space="preserve">
+    <value>Position Z</value>
+  </data>
+  <data name="BBoxDlg_ZPlus" xml:space="preserve">
+    <value>Z+</value>
+  </data>
+  <data name="BBoxDlg_ZCenter" xml:space="preserve">
+    <value>Z Centre</value>
+  </data>
+  <data name="BBoxDlg_ZMinus" xml:space="preserve">
+    <value>Z−</value>
+  </data>
+  <data name="BBoxDlg_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="BBoxDlg_Cancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="CompChecker_GroupLabel" xml:space="preserve">
+    <value>Vérif. comp.</value>
+  </data>
+  <data name="CompChecker_ProfileBtnLabel" xml:space="preserve">
+    <value>Compensation sur profil</value>
+  </data>
+  <data name="CompChecker_CenterBtnLabel" xml:space="preserve">
+    <value>Compensation sur centre</value>
+  </data>
+  <data name="CompChecker_NoCompBtnLabel" xml:space="preserve">
+    <value>Sans compensation</value>
+  </data>
+  <data name="CompChecker_LeadIn" xml:space="preserve">
+    <value>Entrée</value>
+  </data>
+  <data name="CompChecker_LeadOut" xml:space="preserve">
+    <value>Sortie</value>
+  </data>
+  <data name="CompChecker_FinishLeadInOut" xml:space="preserve">
+    <value>Entrée/sortie Finition Parois</value>
+  </data>
+  <data name="CompChecker_OpenPocketLeadInOut" xml:space="preserve">
+    <value>Entrée/sortie poche ouverte</value>
+  </data>
+  <data name="CompChecker_TangentLeadIn" xml:space="preserve">
+    <value>{0} : Le type tangent est incompatible avec la compensation — une entrée perpendiculaire est requise.</value>
+  </data>
+  <data name="CompChecker_TangentLeadOut" xml:space="preserve">
+    <value>{0} : Le type tangent est incompatible avec la compensation — une sortie perpendiculaire est requise.</value>
+  </data>
+  <data name="CompChecker_DistanceTooSmall" xml:space="preserve">
+    <value>{0} : {1} = {2} doit être supérieur au rayon d'outil (R= {3}).</value>
+  </data>
+  <data name="Selection_NoElement" xml:space="preserve">
+    <value>Aucun élément sélectionné. Veuillez sélectionner un solide, une face, une boucle ou une arête.</value>
+  </data>
+  <data name="Selection_MultipleElements" xml:space="preserve">
+    <value>Plusieurs éléments sélectionnés. Veuillez sélectionner un seul élément.</value>
+  </data>
+  <data name="Selection_NotASolid" xml:space="preserve">
+    <value>L'élément sélectionné n'est pas un solide, une face, une boucle ou une arête.</value>
+  </data>
+  <data name="AlignX_NoSelection" xml:space="preserve">
+    <value>Aligner X : aucune sélection. Sélectionnez un point, une arête ligne/arc/cercle, ou une face plane/cylindrique.</value>
+  </data>
+  <data name="AlignX_UnsupportedEdge" xml:space="preserve">
+    <value>Aligner X : type d'arête non supporté. Sélectionnez une arête ligne, arc ou cercle.</value>
+  </data>
+  <data name="AlignX_NoAngle" xml:space="preserve">
+    <value>Aligner X : impossible de déterminer un angle de référence à partir de la sélection.</value>
+  </data>
+  <data name="AlignX_Rotated" xml:space="preserve">
+    <value>Aligner X : rotation de {0:F2}° autour de Z.</value>
+  </data>
+</root>

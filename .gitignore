@@ -26,3 +26,6 @@ Desktop.ini
 
 # Claude Code local settings
 .claude/
+
+# Local secrets (GitHub token, etc.)
+.env

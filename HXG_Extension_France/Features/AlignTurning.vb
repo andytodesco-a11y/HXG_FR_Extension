@@ -86,10 +86,10 @@ Public Class AlignTurningFeature
     ' ── IFeature ─────────────────────────────────────────────────────────────
 
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
-        Dim groupPart As IRibbonGroup = tab.Groups.Add(RIBBON_ALIGN_PART_GROUP_KEY, "Align Part")
-        groupPart.Items.AddButton(BTN_ALIGN_KEY, "Align Turning Part", True, LoadIcon("AlignTurning.ico"))
-        Dim groupOptions As IRibbonGroup = tab.Groups.Add(RIBBON_OPTIONS_GROUP_KEY, "Align Options")
-        Dim Button As IRibbonItem = groupOptions.Items.AddButton(BTN_FLIP_KEY, "Flip Part", True, LoadIcon("FlipPart.ico"))
+        Dim groupPart As IRibbonGroup = tab.Groups.Add(RIBBON_ALIGN_PART_GROUP_KEY, Strings.AlignPart_GroupLabel)
+        groupPart.Items.AddButton(BTN_ALIGN_KEY, Strings.AlignTurning_ButtonLabel, True, LoadIcon("AlignTurning.ico"))
+        Dim groupOptions As IRibbonGroup = tab.Groups.Add(RIBBON_OPTIONS_GROUP_KEY, Strings.AlignOptions_GroupLabel)
+        Dim Button As IRibbonItem = groupOptions.Items.AddButton(BTN_FLIP_KEY, Strings.AlignTurning_FlipButtonLabel, True, LoadIcon("FlipPart.ico"))
 
     End Sub
 
@@ -125,7 +125,7 @@ Public Class AlignTurningFeature
     ''' </summary>
     Private Sub DebugAnalyzeSolid()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("No document is open.") : Return
+        If doc Is Nothing Then LogWarning(Strings.Msg_NoDocument) : Return
 
         Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
         If body Is Nothing Then Return
@@ -296,14 +296,14 @@ Public Class AlignTurningFeature
     ''' </summary>
     Private Sub AlignPart()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("No document is open.") : Return
+        If doc Is Nothing Then LogWarning(Strings.Msg_NoDocument) : Return
 
         Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
         If body Is Nothing Then Return
 
         Dim dominant As AxisLineCluster = GetDominantAxisLine(body)
         If dominant Is Nothing Then
-            LogWarning("No revolution axis found. Ensure a turning part is selected.")
+            LogWarning(Strings.AlignTurning_NoAxis)
             Return
         End If
 
@@ -319,7 +319,7 @@ Public Class AlignTurningFeature
         End If
 
         MoveP0ToTopZ(doc, body)
-        LogInfo("Turning part aligned along Z axis.")
+        LogInfo(Strings.AlignTurning_Done)
         doc.Refresh()
     End Sub
 
@@ -328,13 +328,13 @@ Public Class AlignTurningFeature
     ''' </summary>
     Private Sub FlipPart()
         Dim doc As ESPRIT.Document = _app.Document
-        If doc Is Nothing Then LogWarning("No document is open.") : Return
+        If doc Is Nothing Then LogWarning(Strings.Msg_NoDocument) : Return
 
         Dim body As EspritSolids.ISolidBody = GetSelectedSolidBody(doc)
         If body Is Nothing Then Return
 
         FlipSolid180(doc, body)
-        LogInfo("Part flipped 180° around Y axis through center of gravity.")
+        LogInfo(Strings.AlignTurning_FlipDone)
     End Sub
 
     ''' <summary>
@@ -983,7 +983,7 @@ Public Class AlignTurningFeature
                 End Try
             End Try
         Catch ex As Exception
-            LogWarning($"Could not move P0: {ex.Message}")
+            LogWarning(String.Format(Strings.AlignMilling_P0Error, ex.Message))
         End Try
     End Sub
 

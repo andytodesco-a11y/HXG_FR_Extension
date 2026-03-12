@@ -102,3 +102,39 @@ Remove-Item $tempDir -Recurse -Force
 Write-Host ""
 Write-Host "Package ready: dist\$zipName" -ForegroundColor Green
 Write-Host "Size: $([Math]::Round((Get-Item $zipPath).Length / 1KB, 1)) KB"
+
+# ── GitHub Release (optional) ───────────────────────────────────────────────────
+# Reads GITHUB_TOKEN from .env in the repo root. Skips if not found.
+$envFile = Join-Path $repoRoot ".env"
+$token   = $null
+if (Test-Path $envFile) {
+    Get-Content $envFile | Where-Object { $_ -match '^GITHUB_TOKEN\s*=\s*(.+)' } | ForEach-Object {
+        $token = $matches[1].Trim()
+    }
+}
+
+if (-not $token) {
+    Write-Host ""
+    Write-Host "No GITHUB_TOKEN found in .env — skipping GitHub release." -ForegroundColor DarkGray
+    Write-Host "Add  GITHUB_TOKEN=ghp_...  to .env to publish automatically."
+    exit 0
+}
+
+Write-Host ""
+Write-Host "Creating GitHub release v$Version..." -ForegroundColor Yellow
+
+$repo    = "andytodesco-a11y/HXG_FR_Extension"
+$headers = @{ Authorization = "Bearer $token"; Accept = 'application/vnd.github+json' }
+$body    = @{ tag_name = "v$Version"; name = "v$Version"; draft = $false; prerelease = $false } | ConvertTo-Json
+
+$release = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases" `
+    -Method Post -Headers $headers -Body $body -ContentType 'application/json'
+
+$uploadUrl = $release.upload_url -replace '\{.*\}', ''
+$assetName = "HXG_Extension_France_v$Version.zip"
+
+Invoke-RestMethod -Uri "${uploadUrl}?name=$assetName" -Method Post `
+    -Headers @{ Authorization = "Bearer $token"; Accept = 'application/vnd.github+json'; 'Content-Type' = 'application/zip' } `
+    -InFile $zipPath | Out-Null
+
+Write-Host "Release published: $($release.html_url)" -ForegroundColor Green
