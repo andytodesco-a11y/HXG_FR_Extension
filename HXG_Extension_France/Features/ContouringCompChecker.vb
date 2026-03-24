@@ -33,6 +33,20 @@ Public Class ContouringCompCheckerFeature
     ''' The <paramref name="tab"/> argument (the HXG extension tab) is intentionally ignored.
     ''' </summary>
     Public Sub Setup(tab As IRibbonTab) Implements IFeature.Setup
+        ' Always subscribe to application events, regardless of ribbon state.
+        AddHandler _app.AfterDocumentOpen, AddressOf OnAfterDocumentOpen
+        AddHandler _app.AfterNewDocumentOpen, AddressOf OnAfterNewDocumentOpen
+        AddHandler _app.AfterDocumentClose, AddressOf OnAfterDocumentClose
+
+        ' Attempt ribbon group creation — may silently fail if the context tab doesn't exist yet.
+        TryCreateRibbonGroup()
+
+        If _app.Document IsNot Nothing Then
+            SubscribeToTechUtil()
+        End If
+    End Sub
+
+    Private Sub TryCreateRibbonGroup()
         Try
             Dim ribbon As IRibbon = DirectCast(_app.Ribbon, IRibbon)
             If Not ribbon.Tabs.Contains(TARGET_TAB_KEY) Then Exit Sub
@@ -52,13 +66,6 @@ Public Class ContouringCompCheckerFeature
         Catch
             ' Tab may not exist in the current ESPRIT context — silently skip.
         End Try
-
-        AddHandler _app.AfterDocumentOpen, AddressOf OnAfterDocumentOpen
-        AddHandler _app.AfterNewDocumentOpen, AddressOf OnAfterNewDocumentOpen
-
-        If _app.Document IsNot Nothing Then
-            SubscribeToTechUtil()
-        End If
     End Sub
 
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
@@ -83,11 +90,13 @@ Public Class ContouringCompCheckerFeature
         Try
             RemoveHandler _app.AfterDocumentOpen, AddressOf OnAfterDocumentOpen
             RemoveHandler _app.AfterNewDocumentOpen, AddressOf OnAfterNewDocumentOpen
+            RemoveHandler _app.AfterDocumentClose, AddressOf OnAfterDocumentClose
         Catch
         End Try
         Try
             If _techUtil IsNot Nothing Then
                 RemoveHandler _techUtil.OnTechPageUiLoaded, AddressOf OnTechPageUiLoaded
+                _techUtil = Nothing
             End If
         Catch
         End Try
@@ -112,6 +121,19 @@ Public Class ContouringCompCheckerFeature
 
     Private Sub OnAfterNewDocumentOpen()
         SubscribeToTechUtil()
+    End Sub
+
+    Private Sub OnAfterDocumentClose()
+        Try
+            If _techUtil IsNot Nothing Then
+                RemoveHandler _techUtil.OnTechPageUiLoaded, AddressOf OnTechPageUiLoaded
+                _techUtil = Nothing
+            End If
+        Catch
+        End Try
+        If _splitButton IsNot Nothing Then
+            _splitButton.Visible = False
+        End If
     End Sub
 
     Private Sub SubscribeToTechUtil()
