@@ -330,7 +330,7 @@ Public Class ChannelTimelineControl
 
             For si As Integer = 1 To syncCount
                 Dim apiSync = syncsColl.Item(si)
-                Dim sd As New SyncData() With {.SyncId = CInt(apiSync.Id)}
+                Dim sd As New SyncData() With {.DisplayNumber = _syncs.Count + 1}
 
                 Dim posColl = apiSync.ChannelItemPositions
                 Dim posCount As Integer = CInt(posColl.Count)
@@ -603,7 +603,7 @@ Public Class ChannelTimelineControl
             Dim labelX As Single = syncX + 4.0F
             Dim labelY As Single = HEADER_HEIGHT + minRow * ROW_HEIGHT + 6.0F
             Using f As New Font("Segoe UI", 7.0F, FontStyle.Bold)
-                Dim label As String = $"S{sd.SyncId}"
+                Dim label As String = $"S{sd.DisplayNumber}"
                 Dim sz As SizeF = g.MeasureString(label, f)
                 Using bgBr As New SolidBrush(Color.FromArgb(210, 255, 255, 255))
                     g.FillRectangle(bgBr, labelX - 1.0F, labelY - 1.0F, sz.Width + 2.0F, sz.Height + 2.0F)
@@ -852,7 +852,7 @@ Public Class ChannelTimelineControl
     End Class
 
     Private Class SyncData
-        Public SyncId As Integer
+        Public DisplayNumber As Integer
         Public Positions As New List(Of SyncPositionData)
     End Class
 
