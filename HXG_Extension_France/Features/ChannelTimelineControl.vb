@@ -772,7 +772,9 @@ Public Class ChannelTimelineControl
 
         Dim notches As Integer = e.Delta / 120
         Dim factor As Double = Math.Pow(1.2, notches)
-        _zoomX = Math.Max(0.25, Math.Min(10.0, _zoomX * factor))
+        ' Upper bound keeps the panel width below GDI+ practical limits
+        ' (MIN_DRAW_WIDTH × 50 ≈ 37,500 px).
+        _zoomX = Math.Max(0.25, Math.Min(50.0, _zoomX * factor))
 
         UpdatePanelSize()
 
