@@ -154,7 +154,7 @@
     <Compile Include="Features\AlignTurning.vb" />
     <Compile Include="Features\ChannelTimeline.vb" />
     <Compile Include="Features\ChannelTimelineControl.vb">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Features\ContouringCompChecker.vb" />
     <Compile Include="Features\DebugExploration.vb" />

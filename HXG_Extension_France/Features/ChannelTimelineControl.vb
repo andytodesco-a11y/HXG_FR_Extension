@@ -68,6 +68,8 @@ Public Class ChannelTimelineControl
     Private _toolPanel As Panel
     Private _refreshButton As Button
     Private _infoLabel As Label
+    Private _zoomLabel As Label
+    Private _zoomResetButton As Button
     Private _scrollPanel As Panel
     Private _timelinePanel As DoubleBufferedPanel
     Private _legendPanel As Panel
@@ -116,17 +118,36 @@ Public Class ChannelTimelineControl
         AddHandler _refreshButton.Click, AddressOf OnRefreshClick
 
         _infoLabel = New Label() With {
-            .AutoSize = False,
+            .AutoSize = True,
             .Location = New Point(106, 9),
-            .Width = 780,
-            .Height = 20,
+            .TextAlign = ContentAlignment.MiddleLeft,
+            .Font = New Font("Segoe UI", 8.5F),
+            .ForeColor = Color.FromArgb(55, 55, 70)
+        }
+        AddHandler _infoLabel.TextChanged, AddressOf OnInfoLabelTextChanged
+
+        ' Zoom readout + reset button — laid out inline right after the info label.
+        _zoomLabel = New Label() With {
+            .AutoSize = True,
             .TextAlign = ContentAlignment.MiddleLeft,
             .Font = New Font("Segoe UI", 8.5F),
             .ForeColor = Color.FromArgb(55, 55, 70)
         }
 
+        _zoomResetButton = New Button() With {
+            .Text = "100%",
+            .Width = 60,
+            .Height = 24,
+            .FlatStyle = FlatStyle.System
+        }
+        AddHandler _zoomResetButton.Click, AddressOf OnZoomResetClick
+
         _toolPanel.Controls.Add(_refreshButton)
         _toolPanel.Controls.Add(_infoLabel)
+        _toolPanel.Controls.Add(_zoomLabel)
+        _toolPanel.Controls.Add(_zoomResetButton)
+
+        UpdateZoomReadout()
 
         ' ── Legend ───────────────────────────────────────────────────────────
         _legendPanel = New Panel() With {
@@ -761,8 +782,43 @@ Public Class ChannelTimelineControl
         Dim newScrollX As Integer = Math.Max(0, newPanelX - e.X)
         _scrollPanel.AutoScrollPosition = New Point(newScrollX, -_scrollPanel.AutoScrollPosition.Y)
 
-        _infoLabel.Text = _baseInfoText & $"    |    Zoom: {CInt(_zoomX * 100)}%"
+        UpdateZoomReadout()
         _timelinePanel.Invalidate()
+    End Sub
+
+    Private Sub OnZoomResetClick(sender As Object, e As EventArgs)
+        If Math.Abs(_zoomX - 1.0) < 0.001 Then Return
+        _zoomX = 1.0
+        UpdatePanelSize()
+        _scrollPanel.AutoScrollPosition = New Point(0, 0)
+        UpdateZoomReadout()
+        _timelinePanel.Invalidate()
+    End Sub
+
+    ''' <summary>
+    ''' Refreshes the zoom label text with the current zoom percentage and
+    ''' toggles the reset button state. Label and button stay visible at all
+    ''' times; the button is disabled when already at 100%.
+    ''' </summary>
+    Private Sub UpdateZoomReadout()
+        Dim zoomed As Boolean = Math.Abs(_zoomX - 1.0) > 0.001
+        _zoomLabel.Text = $"    |    Zoom: {CInt(_zoomX * 100)}%"
+        _zoomResetButton.Enabled = zoomed
+        LayoutInfoRow()
+    End Sub
+
+    Private Sub OnInfoLabelTextChanged(sender As Object, e As EventArgs)
+        LayoutInfoRow()
+    End Sub
+
+    ''' <summary>
+    ''' Positions the zoom label and reset button immediately to the right of
+    ''' the auto-sized info label so they sit next to the channel-count text.
+    ''' </summary>
+    Private Sub LayoutInfoRow()
+        Const GAP As Integer = 4
+        _zoomLabel.Location = New Point(_infoLabel.Right, 9)
+        _zoomResetButton.Location = New Point(_zoomLabel.Right + GAP, 7)
     End Sub
 
     ' ── Control events ───────────────────────────────────────────────────────
