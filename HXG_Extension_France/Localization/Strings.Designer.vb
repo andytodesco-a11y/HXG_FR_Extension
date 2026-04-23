@@ -426,9 +426,21 @@ Friend Module Strings
         End Get
     End Property
 
-    Friend ReadOnly Property Timeline_Legend_MachineOp As String
+    Friend ReadOnly Property Timeline_Legend_MachineOp_Turning As String
         Get
-            Return S("Timeline_Legend_MachineOp")
+            Return S("Timeline_Legend_MachineOp_Turning")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_MachineOp_Milling As String
+        Get
+            Return S("Timeline_Legend_MachineOp_Milling")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_MachineOp_Other As String
+        Get
+            Return S("Timeline_Legend_MachineOp_Other")
         End Get
     End Property
 

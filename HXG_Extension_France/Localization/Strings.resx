@@ -242,8 +242,14 @@
   <data name="Timeline_ChannelEmpty" xml:space="preserve">
     <value>(empty)</value>
   </data>
-  <data name="Timeline_Legend_MachineOp" xml:space="preserve">
-    <value>Machine Op.</value>
+  <data name="Timeline_Legend_MachineOp_Turning" xml:space="preserve">
+    <value>Turning Op.</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp_Milling" xml:space="preserve">
+    <value>Milling Op.</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp_Other" xml:space="preserve">
+    <value>Other Op.</value>
   </data>
   <data name="Timeline_Legend_ToolPath" xml:space="preserve">
     <value>Toolpath</value>

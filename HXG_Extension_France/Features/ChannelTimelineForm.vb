@@ -47,10 +47,16 @@ Public Class ChannelTimelineForm
     Private Const TYPE_TOOLPATH As Integer = 16
     Private Const TYPE_SETUP_CHANGE As Integer = 32
 
+    ' ── Technology categories (espTechnologyCategory) ─────────────────────────
+    Private Const TECH_CAT_MILLING As Integer = 4
+    Private Const TECH_CAT_TURNING As Integer = 5
+
     ' ── Colors ────────────────────────────────────────────────────────────────
-    Private Shared ReadOnly CLR_MACHINE_OP As Color = Color.FromArgb(65, 130, 210)
+    Private Shared ReadOnly CLR_MACHINE_OP_TURNING As Color = Color.FromArgb(65, 130, 210)
+    Private Shared ReadOnly CLR_MACHINE_OP_MILLING As Color = Color.FromArgb(235, 140, 40)
+    Private Shared ReadOnly CLR_MACHINE_OP_OTHER As Color = Color.FromArgb(95, 170, 95)
     Private Shared ReadOnly CLR_TOOLPATH As Color = Color.FromArgb(65, 170, 85)
-    Private Shared ReadOnly CLR_TOOL_CHANGE As Color = Color.FromArgb(235, 125, 35)
+    Private Shared ReadOnly CLR_TOOL_CHANGE As Color = Color.FromArgb(240, 200, 40)
     Private Shared ReadOnly CLR_SETUP_CHANGE As Color = Color.FromArgb(145, 85, 185)
     Private Shared ReadOnly CLR_LINK As Color = Color.FromArgb(185, 185, 195)
     Private Shared ReadOnly CLR_SYNC_NODE As Color = Color.FromArgb(210, 55, 55)
@@ -208,10 +214,19 @@ Public Class ChannelTimelineForm
             Const OFFSET As Long = 1000000L
             Dim timeLookup As New Dictionary(Of Long, Double)
 
-            ' MachineOperation lookup: same key → op name. IChannelItem has no direct link
-            ' to IMachineOperation, so we invert via op.Before.ChannelItem / op.Before.Channel.
+            ' MachineOperation lookup: same key → op name + technology category.
+            ' IChannelItem has no direct link to IMachineOperation, so we invert via
+            ' op.Before.ChannelItem / op.Before.Channel. Category is resolved through
+            ' TechnologyUtility.GetCategory(PartOperation.Technology.TechnologyType) —
+            ' strongly typed so the COM vtable call lands on the right GetCategory overload.
             Dim opNameLookup As New Dictionary(Of Long, String)
+            Dim opCategoryLookup As New Dictionary(Of Long, Integer)
             Try
+                Dim techUtil As EspritTechnology.TechnologyUtility = Nothing
+                Try
+                    techUtil = CType(doc.TechnologyUtility, EspritTechnology.TechnologyUtility)
+                Catch
+                End Try
                 Dim opsColl = doc.MachineOperations
                 Dim opsCount As Integer = CInt(opsColl.Count)
                 For oi As Integer = 1 To opsCount
@@ -221,7 +236,21 @@ Public Class ChannelTimelineForm
                         If pos IsNot Nothing AndAlso pos.ChannelItem IsNot Nothing AndAlso pos.Channel IsNot Nothing Then
                             Dim chIdx As Integer = CInt(pos.Channel.Index)
                             Dim ciIdx As Long = CLng(pos.ChannelItem.Index)
-                            opNameLookup(CLng(chIdx) * OFFSET + ciIdx) = CStr(op.Name)
+                            Dim key As Long = CLng(chIdx) * OFFSET + ciIdx
+                            opNameLookup(key) = CStr(op.Name)
+                            If techUtil IsNot Nothing Then
+                                Try
+                                    Dim partOp = op.PartOperation
+                                    If partOp IsNot Nothing Then
+                                        Dim tech As EspritTechnology.ITechnology = CType(partOp.Technology, EspritTechnology.ITechnology)
+                                        If tech IsNot Nothing Then
+                                            Dim cat As EspritConstants.espTechnologyCategory = techUtil.GetCategory(tech.TechnologyType)
+                                            opCategoryLookup(key) = CInt(cat)
+                                        End If
+                                    End If
+                                Catch
+                                End Try
+                            End If
                         End If
                     Catch
                     End Try
@@ -263,6 +292,10 @@ Public Class ChannelTimelineForm
                         Dim opName As String = Nothing
                         If opNameLookup.TryGetValue(opKey, opName) Then
                             id.OperationName = opName
+                        End If
+                        Dim opCat As Integer
+                        If opCategoryLookup.TryGetValue(opKey, opCat) Then
+                            id.OperationCategory = opCat
                         End If
                     End If
                     timeLookup(CLng(apiChannelIndex) * OFFSET + id.ItemIndex) = runningTime
@@ -468,7 +501,7 @@ Public Class ChannelTimelineForm
         If id.CycleTime <= 0 Then Return
 
         Dim w As Integer = Math.Max(MIN_ITEM_PIXELS, CInt((id.CycleTime / _totalTime) * drawWidth))
-        Dim fillColor As Color = GetItemColor(id.ItemType)
+        Dim fillColor As Color = GetItemColor(id)
         Dim rect As New Rectangle(x, barY, w, barH)
 
         Using br As New SolidBrush(fillColor)
@@ -587,8 +620,9 @@ Public Class ChannelTimelineForm
             Dim x As Integer = 10
             Dim midY As Integer = _legendPanel.Height \ 2
 
-            x = DrawLegendEntry(g, f, CLR_MACHINE_OP, Strings.Timeline_Legend_MachineOp, x, midY, SW, GAP) + SPACING
-            x = DrawLegendEntry(g, f, CLR_TOOLPATH, Strings.Timeline_Legend_ToolPath, x, midY, SW, GAP) + SPACING
+            x = DrawLegendEntry(g, f, CLR_MACHINE_OP_TURNING, Strings.Timeline_Legend_MachineOp_Turning, x, midY, SW, GAP) + SPACING
+            x = DrawLegendEntry(g, f, CLR_MACHINE_OP_MILLING, Strings.Timeline_Legend_MachineOp_Milling, x, midY, SW, GAP) + SPACING
+            x = DrawLegendEntry(g, f, CLR_MACHINE_OP_OTHER, Strings.Timeline_Legend_MachineOp_Other, x, midY, SW, GAP) + SPACING
             x = DrawLegendEntry(g, f, CLR_TOOL_CHANGE, Strings.Timeline_Legend_ToolChange, x, midY, SW, GAP) + SPACING
             x = DrawLegendEntry(g, f, CLR_SETUP_CHANGE, Strings.Timeline_Legend_SetupChange, x, midY, SW, GAP) + SPACING
             x = DrawLegendEntry(g, f, CLR_LINK, Strings.Timeline_Legend_Link, x, midY, SW, GAP) + SPACING
@@ -619,7 +653,7 @@ Public Class ChannelTimelineForm
         If item Is _lastTooltipItem Then Return
         _lastTooltipItem = item
         If item IsNot Nothing Then
-            Dim tip As String = $"{GetItemTypeName(item.ItemType)}  —  {item.CycleTime:F3} s"
+            Dim tip As String = $"{GetItemTypeName(item)}  —  {item.CycleTime:F3} s"
             If Not String.IsNullOrEmpty(item.OperationName) Then
                 tip = $"{item.OperationName}" & Environment.NewLine & tip
             End If
@@ -660,24 +694,42 @@ Public Class ChannelTimelineForm
 
     ' ── Color helpers ─────────────────────────────────────────────────────────
 
-    Private Function GetItemColor(itemType As Integer) As Color
-        If (itemType And TYPE_SYNC_NODE) <> 0 Then Return CLR_SYNC_NODE
-        If (itemType And TYPE_TOOL_CHANGE) <> 0 Then Return CLR_TOOL_CHANGE
-        If (itemType And TYPE_SETUP_CHANGE) <> 0 Then Return CLR_SETUP_CHANGE
-        If (itemType And TYPE_MACHINE_OP) <> 0 Then Return CLR_MACHINE_OP
-        If (itemType And TYPE_TOOLPATH) <> 0 Then Return CLR_TOOLPATH
-        If (itemType And TYPE_LINK) <> 0 Then Return CLR_LINK
+    Private Function GetItemColor(id As ItemData) As Color
+        Dim t As Integer = id.ItemType
+        If (t And TYPE_SYNC_NODE) <> 0 Then Return CLR_SYNC_NODE
+        If (t And TYPE_TOOL_CHANGE) <> 0 Then Return CLR_TOOL_CHANGE
+        If (t And TYPE_SETUP_CHANGE) <> 0 Then Return CLR_SETUP_CHANGE
+        If (t And TYPE_MACHINE_OP) <> 0 Then Return GetMachineOpColor(id.OperationCategory)
+        If (t And TYPE_TOOLPATH) <> 0 Then Return CLR_TOOLPATH
+        If (t And TYPE_LINK) <> 0 Then Return CLR_LINK
         Return CLR_UNKNOWN
     End Function
 
-    Private Function GetItemTypeName(itemType As Integer) As String
-        If (itemType And TYPE_SYNC_NODE) <> 0 Then Return Strings.Timeline_Legend_Sync
-        If (itemType And TYPE_TOOL_CHANGE) <> 0 Then Return Strings.Timeline_Legend_ToolChange
-        If (itemType And TYPE_SETUP_CHANGE) <> 0 Then Return Strings.Timeline_Legend_SetupChange
-        If (itemType And TYPE_MACHINE_OP) <> 0 Then Return Strings.Timeline_Legend_MachineOp
-        If (itemType And TYPE_TOOLPATH) <> 0 Then Return Strings.Timeline_Legend_ToolPath
-        If (itemType And TYPE_LINK) <> 0 Then Return Strings.Timeline_Legend_Link
-        Return $"Type {itemType}"
+    Private Shared Function GetMachineOpColor(category As Integer) As Color
+        Select Case category
+            Case TECH_CAT_TURNING : Return CLR_MACHINE_OP_TURNING
+            Case TECH_CAT_MILLING : Return CLR_MACHINE_OP_MILLING
+            Case Else : Return CLR_MACHINE_OP_OTHER
+        End Select
+    End Function
+
+    Private Shared Function GetMachineOpLabel(category As Integer) As String
+        Select Case category
+            Case TECH_CAT_TURNING : Return Strings.Timeline_Legend_MachineOp_Turning
+            Case TECH_CAT_MILLING : Return Strings.Timeline_Legend_MachineOp_Milling
+            Case Else : Return Strings.Timeline_Legend_MachineOp_Other
+        End Select
+    End Function
+
+    Private Function GetItemTypeName(id As ItemData) As String
+        Dim t As Integer = id.ItemType
+        If (t And TYPE_SYNC_NODE) <> 0 Then Return Strings.Timeline_Legend_Sync
+        If (t And TYPE_TOOL_CHANGE) <> 0 Then Return Strings.Timeline_Legend_ToolChange
+        If (t And TYPE_SETUP_CHANGE) <> 0 Then Return Strings.Timeline_Legend_SetupChange
+        If (t And TYPE_MACHINE_OP) <> 0 Then Return GetMachineOpLabel(id.OperationCategory)
+        If (t And TYPE_TOOLPATH) <> 0 Then Return Strings.Timeline_Legend_ToolPath
+        If (t And TYPE_LINK) <> 0 Then Return Strings.Timeline_Legend_Link
+        Return $"Type {t}"
     End Function
 
     Private Shared Function DarkenColor(c As Color, factor As Single) As Color
@@ -741,6 +793,7 @@ Public Class ChannelTimelineForm
         Public StartTime As Double
         Public ItemIndex As Long
         Public OperationName As String
+        Public OperationCategory As Integer
     End Class
 
     Private Class SyncData

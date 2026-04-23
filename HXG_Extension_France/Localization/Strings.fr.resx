@@ -303,8 +303,14 @@
   <data name="Timeline_ChannelEmpty" xml:space="preserve">
     <value>(vide)</value>
   </data>
-  <data name="Timeline_Legend_MachineOp" xml:space="preserve">
-    <value>Opération machine</value>
+  <data name="Timeline_Legend_MachineOp_Turning" xml:space="preserve">
+    <value>Op. Tournage</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp_Milling" xml:space="preserve">
+    <value>Op. Fraisage</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp_Other" xml:space="preserve">
+    <value>Op. Autre</value>
   </data>
   <data name="Timeline_Legend_ToolPath" xml:space="preserve">
     <value>Trajectoire</value>
