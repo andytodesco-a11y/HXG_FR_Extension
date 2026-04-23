@@ -16,7 +16,8 @@ Friend NotInheritable Class DoubleBufferedPanel
 End Class
 
 ''' <summary>
-''' Modeless Gantt-style timeline form for multi-turret channel analysis.
+''' Gantt-style timeline UserControl for multi-turret channel analysis.
+''' Hosted inside a dockable ESPRIT IPane (see ChannelTimelineFeature).
 '''
 ''' Layout (top → bottom):
 '''   Toolbar  : Refresh button + cycle time + channel count info
@@ -25,8 +26,8 @@ End Class
 '''
 ''' Data source: Document.Program → IChannels → IChannelItems + ISyncs
 ''' </summary>
-Public Class ChannelTimelineForm
-    Inherits Form
+Public Class ChannelTimelineControl
+    Inherits UserControl
 
     ' ── Layout ────────────────────────────────────────────────────────────────
     Private Const LABEL_WIDTH As Integer = 130
@@ -95,11 +96,7 @@ Public Class ChannelTimelineForm
     Private Sub InitializeComponent()
         SuspendLayout()
 
-        Text = Strings.Timeline_FormTitle
-        Size = New Size(960, 560)
-        MinimumSize = New Size(640, 400)
-        StartPosition = FormStartPosition.CenterScreen
-        FormBorderStyle = FormBorderStyle.Sizable
+        MinimumSize = New Size(640, 320)
         BackColor = Color.White
 
         ' ── Toolbar ──────────────────────────────────────────────────────────
@@ -169,7 +166,7 @@ Public Class ChannelTimelineForm
         Controls.Add(_legendPanel)
         Controls.Add(_toolPanel)
 
-        AddHandler Resize, AddressOf OnFormResize
+        AddHandler Resize, AddressOf OnControlResize
 
         ResumeLayout(False)
     End Sub
@@ -768,13 +765,13 @@ Public Class ChannelTimelineForm
         _timelinePanel.Invalidate()
     End Sub
 
-    ' ── Form events ───────────────────────────────────────────────────────────
+    ' ── Control events ───────────────────────────────────────────────────────
 
     Private Sub OnRefreshClick(sender As Object, e As EventArgs)
         LoadData()
     End Sub
 
-    Private Sub OnFormResize(sender As Object, e As EventArgs)
+    Private Sub OnControlResize(sender As Object, e As EventArgs)
         UpdatePanelSize()
         _timelinePanel.Invalidate()
     End Sub

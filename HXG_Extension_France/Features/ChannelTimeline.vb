@@ -2,7 +2,7 @@ Imports ESPRIT.NetApi.Ribbon
 
 ''' <summary>
 ''' Feature: Channel Timeline
-''' Opens a modeless Gantt-style panel for multi-turret channel analysis.
+''' Hosts the Gantt-style multi-turret timeline inside a dockable ESPRIT pane.
 ''' Auto-refreshes when the active document changes.
 ''' </summary>
 Public Class ChannelTimelineFeature
@@ -10,9 +10,11 @@ Public Class ChannelTimelineFeature
 
     Private Const RIBBON_GROUP_KEY As String = "ChannelTimeline_Group"
     Private Const RIBBON_BTN_KEY As String = "ChannelTimeline_Btn"
+    Private Const PANE_KEY As String = "HXG_ChannelTimeline"
 
     Private ReadOnly _app As ESPRIT.Application
-    Private _form As ChannelTimelineForm
+    Private _control As ChannelTimelineControl
+    Private _pane As Object   ' Esprit.Pane — late-bound to avoid extra type coupling
 
     Public Sub New(app As ESPRIT.Application)
         _app = app
@@ -32,7 +34,7 @@ Public Class ChannelTimelineFeature
     Public Function HandleButtonClick(e As ButtonClickEventArgs) As Boolean Implements IFeature.HandleButtonClick
         If e.Key <> RIBBON_BTN_KEY Then Return False
         e.Handled = True
-        ShowOrFocusForm()
+        TogglePane()
         Return True
     End Function
 
@@ -44,52 +46,97 @@ Public Class ChannelTimelineFeature
         Catch
         End Try
         Try
-            If _form IsNot Nothing AndAlso Not _form.IsDisposed Then
-                _form.Close()
+            If _pane IsNot Nothing Then
+                _app.Panes.RemoveByKey(PANE_KEY)
             End If
         Catch
         End Try
-        _form = Nothing
-    End Sub
-
-    ' ── Form lifecycle ────────────────────────────────────────────────────────
-
-    Private Sub ShowOrFocusForm()
-        If _form IsNot Nothing AndAlso Not _form.IsDisposed Then
-            _form.RefreshData()
-            If _form.WindowState = System.Windows.Forms.FormWindowState.Minimized Then
-                _form.WindowState = System.Windows.Forms.FormWindowState.Normal
+        Try
+            If _control IsNot Nothing AndAlso Not _control.IsDisposed Then
+                _control.Dispose()
             End If
-            _form.Activate()
-        Else
-            _form = New ChannelTimelineForm(_app)
-            AddHandler _form.FormClosed, AddressOf OnFormClosed
-            _form.Show()
-        End If
+        Catch
+        End Try
+        _pane = Nothing
+        _control = Nothing
     End Sub
 
-    Private Sub OnFormClosed(sender As Object, e As System.Windows.Forms.FormClosedEventArgs)
-        _form = Nothing
+    ' ── Pane lifecycle ────────────────────────────────────────────────────────
+
+    ''' <summary>
+    ''' First click: creates the pane and hosts the timeline control.
+    ''' Subsequent clicks: toggles pane visibility (and refreshes on show).
+    ''' </summary>
+    Private Sub TogglePane()
+        If _pane Is Nothing Then
+            CreatePane()
+            Return
+        End If
+
+        Try
+            If _pane.Visible Then
+                _pane.Visible = False
+            Else
+                _pane.Visible = True
+                _pane.Activate()
+                If _control IsNot Nothing Then _control.RefreshData()
+            End If
+        Catch
+            ' Pane was likely disposed externally — recreate.
+            _pane = Nothing
+            _control = Nothing
+            CreatePane()
+        End Try
+    End Sub
+
+    Private Sub CreatePane()
+        Try
+            If _app.Panes.Contains(PANE_KEY) Then
+                _app.Panes.RemoveByKey(PANE_KEY)
+            End If
+        Catch
+        End Try
+
+        _control = New ChannelTimelineControl(_app) With {
+            .Dock = System.Windows.Forms.DockStyle.Fill
+        }
+
+        _pane = _app.Panes.Add(PANE_KEY)
+        _pane.Caption = Strings.Timeline_FormTitle
+
+        Try
+            Dim icon As System.Drawing.Icon = ExtensionUtilities.LoadIcon("Timeline.ico")
+            If icon IsNot Nothing Then
+                _pane.SetIcon(icon.Handle.ToInt64())
+            End If
+        Catch
+        End Try
+
+        _pane.SetControl(_control)
+        _pane.Visible = True
+        _pane.Activate()
     End Sub
 
     ' ── Document events ───────────────────────────────────────────────────────
 
     Private Sub OnDocumentOpened(filePath As String)
-        If _form IsNot Nothing AndAlso Not _form.IsDisposed Then
-            _form.RefreshData()
-        End If
+        RefreshIfVisible()
     End Sub
 
     Private Sub OnNewDocumentOpened()
-        If _form IsNot Nothing AndAlso Not _form.IsDisposed Then
-            _form.RefreshData()
-        End If
+        RefreshIfVisible()
     End Sub
 
     Private Sub OnDocumentClosed()
-        If _form IsNot Nothing AndAlso Not _form.IsDisposed Then
-            _form.RefreshData()
-        End If
+        RefreshIfVisible()
+    End Sub
+
+    Private Sub RefreshIfVisible()
+        If _control Is Nothing OrElse _control.IsDisposed Then Return
+        Try
+            _control.RefreshData()
+        Catch
+        End Try
     End Sub
 
 End Class

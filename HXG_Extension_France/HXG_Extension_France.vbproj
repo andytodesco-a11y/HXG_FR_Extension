@@ -153,8 +153,8 @@
     <Compile Include="Features\AlignMilling.vb" />
     <Compile Include="Features\AlignTurning.vb" />
     <Compile Include="Features\ChannelTimeline.vb" />
-    <Compile Include="Features\ChannelTimelineForm.vb">
-      <SubType>Component</SubType>
+    <Compile Include="Features\ChannelTimelineControl.vb">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Features\ContouringCompChecker.vb" />
     <Compile Include="Features\DebugExploration.vb" />
