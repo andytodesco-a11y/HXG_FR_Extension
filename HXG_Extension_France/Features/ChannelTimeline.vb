@@ -15,6 +15,7 @@ Public Class ChannelTimelineFeature
     Private ReadOnly _app As ESPRIT.Application
     Private _control As ChannelTimelineControl
     Private _pane As Object   ' Esprit.Pane — late-bound to avoid extra type coupling
+    Private _linksReadyHooked As Boolean
 
     Public Sub New(app As ESPRIT.Application)
         _app = app
@@ -51,6 +52,7 @@ Public Class ChannelTimelineFeature
             RemoveHandler _app.AfterDocumentClose, AddressOf OnDocumentClosed
         Catch
         End Try
+        DetachLinksReady()
         ' Do NOT call Panes.RemoveByKey: leaving the pane registered with a
         ' stable key lets ESPRIT's layout manager remember its docking
         ' position and visibility for the next session.
@@ -141,15 +143,47 @@ Public Class ChannelTimelineFeature
     ' ── Document events ───────────────────────────────────────────────────────
 
     Private Sub OnDocumentOpened(filePath As String)
+        AttachLinksReady()
         RefreshControl()
     End Sub
 
     Private Sub OnNewDocumentOpened()
+        AttachLinksReady()
         RefreshControl()
     End Sub
 
     Private Sub OnDocumentClosed()
+        DetachLinksReady()
         RefreshControl()
+    End Sub
+
+    Private Sub OnLinksReady()
+        RefreshControl()
+    End Sub
+
+    ''' <summary>
+    ''' Subscribes to Document.OnLinksReady so the timeline auto-refreshes
+    ''' when ESPRIT finishes recomputing operation links. Called from document
+    ''' open events because _app.Document is Nothing until a document exists.
+    ''' Idempotent — safe to call repeatedly.
+    ''' </summary>
+    Private Sub AttachLinksReady()
+        If _linksReadyHooked Then Return
+        Try
+            If _app.Document Is Nothing Then Return
+            AddHandler _app.Document.OnLinksReady, AddressOf OnLinksReady
+            _linksReadyHooked = True
+        Catch
+        End Try
+    End Sub
+
+    Private Sub DetachLinksReady()
+        If Not _linksReadyHooked Then Return
+        Try
+            RemoveHandler _app.Document.OnLinksReady, AddressOf OnLinksReady
+        Catch
+        End Try
+        _linksReadyHooked = False
     End Sub
 
     Private Sub RefreshControl()
