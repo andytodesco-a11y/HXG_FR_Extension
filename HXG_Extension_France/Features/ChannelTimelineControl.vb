@@ -16,7 +16,8 @@ Friend NotInheritable Class DoubleBufferedPanel
 End Class
 
 ''' <summary>
-''' Modeless Gantt-style timeline form for multi-turret channel analysis.
+''' Gantt-style timeline UserControl for multi-turret channel analysis.
+''' Hosted inside a dockable ESPRIT IPane (see ChannelTimelineFeature).
 '''
 ''' Layout (top → bottom):
 '''   Toolbar  : Refresh button + cycle time + channel count info
@@ -25,8 +26,8 @@ End Class
 '''
 ''' Data source: Document.Program → IChannels → IChannelItems + ISyncs
 ''' </summary>
-Public Class ChannelTimelineForm
-    Inherits Form
+Public Class ChannelTimelineControl
+    Inherits UserControl
 
     ' ── Layout ────────────────────────────────────────────────────────────────
     Private Const LABEL_WIDTH As Integer = 130
@@ -67,6 +68,8 @@ Public Class ChannelTimelineForm
     Private _toolPanel As Panel
     Private _refreshButton As Button
     Private _infoLabel As Label
+    Private _zoomLabel As Label
+    Private _zoomResetButton As Button
     Private _scrollPanel As Panel
     Private _timelinePanel As DoubleBufferedPanel
     Private _legendPanel As Panel
@@ -95,11 +98,7 @@ Public Class ChannelTimelineForm
     Private Sub InitializeComponent()
         SuspendLayout()
 
-        Text = Strings.Timeline_FormTitle
-        Size = New Size(960, 560)
-        MinimumSize = New Size(640, 400)
-        StartPosition = FormStartPosition.CenterScreen
-        FormBorderStyle = FormBorderStyle.Sizable
+        MinimumSize = New Size(640, 320)
         BackColor = Color.White
 
         ' ── Toolbar ──────────────────────────────────────────────────────────
@@ -119,17 +118,36 @@ Public Class ChannelTimelineForm
         AddHandler _refreshButton.Click, AddressOf OnRefreshClick
 
         _infoLabel = New Label() With {
-            .AutoSize = False,
+            .AutoSize = True,
             .Location = New Point(106, 9),
-            .Width = 780,
-            .Height = 20,
+            .TextAlign = ContentAlignment.MiddleLeft,
+            .Font = New Font("Segoe UI", 8.5F),
+            .ForeColor = Color.FromArgb(55, 55, 70)
+        }
+        AddHandler _infoLabel.TextChanged, AddressOf OnInfoLabelTextChanged
+
+        ' Zoom readout + reset button — laid out inline right after the info label.
+        _zoomLabel = New Label() With {
+            .AutoSize = True,
             .TextAlign = ContentAlignment.MiddleLeft,
             .Font = New Font("Segoe UI", 8.5F),
             .ForeColor = Color.FromArgb(55, 55, 70)
         }
 
+        _zoomResetButton = New Button() With {
+            .Text = "100%",
+            .Width = 60,
+            .Height = 24,
+            .FlatStyle = FlatStyle.System
+        }
+        AddHandler _zoomResetButton.Click, AddressOf OnZoomResetClick
+
         _toolPanel.Controls.Add(_refreshButton)
         _toolPanel.Controls.Add(_infoLabel)
+        _toolPanel.Controls.Add(_zoomLabel)
+        _toolPanel.Controls.Add(_zoomResetButton)
+
+        UpdateZoomReadout()
 
         ' ── Legend ───────────────────────────────────────────────────────────
         _legendPanel = New Panel() With {
@@ -169,7 +187,7 @@ Public Class ChannelTimelineForm
         Controls.Add(_legendPanel)
         Controls.Add(_toolPanel)
 
-        AddHandler Resize, AddressOf OnFormResize
+        AddHandler Resize, AddressOf OnControlResize
 
         ResumeLayout(False)
     End Sub
@@ -312,7 +330,7 @@ Public Class ChannelTimelineForm
 
             For si As Integer = 1 To syncCount
                 Dim apiSync = syncsColl.Item(si)
-                Dim sd As New SyncData() With {.SyncId = CInt(apiSync.Id)}
+                Dim sd As New SyncData() With {.DisplayNumber = _syncs.Count + 1}
 
                 Dim posColl = apiSync.ChannelItemPositions
                 Dim posCount As Integer = CInt(posColl.Count)
@@ -585,7 +603,7 @@ Public Class ChannelTimelineForm
             Dim labelX As Single = syncX + 4.0F
             Dim labelY As Single = HEADER_HEIGHT + minRow * ROW_HEIGHT + 6.0F
             Using f As New Font("Segoe UI", 7.0F, FontStyle.Bold)
-                Dim label As String = $"S{sd.SyncId}"
+                Dim label As String = $"S{sd.DisplayNumber}"
                 Dim sz As SizeF = g.MeasureString(label, f)
                 Using bgBr As New SolidBrush(Color.FromArgb(210, 255, 255, 255))
                     g.FillRectangle(bgBr, labelX - 1.0F, labelY - 1.0F, sz.Width + 2.0F, sz.Height + 2.0F)
@@ -754,7 +772,9 @@ Public Class ChannelTimelineForm
 
         Dim notches As Integer = e.Delta / 120
         Dim factor As Double = Math.Pow(1.2, notches)
-        _zoomX = Math.Max(0.25, Math.Min(10.0, _zoomX * factor))
+        ' Upper bound keeps the panel width below GDI+ practical limits
+        ' (MIN_DRAW_WIDTH × 50 ≈ 37,500 px).
+        _zoomX = Math.Max(0.25, Math.Min(50.0, _zoomX * factor))
 
         UpdatePanelSize()
 
@@ -764,17 +784,52 @@ Public Class ChannelTimelineForm
         Dim newScrollX As Integer = Math.Max(0, newPanelX - e.X)
         _scrollPanel.AutoScrollPosition = New Point(newScrollX, -_scrollPanel.AutoScrollPosition.Y)
 
-        _infoLabel.Text = _baseInfoText & $"    |    Zoom: {CInt(_zoomX * 100)}%"
+        UpdateZoomReadout()
         _timelinePanel.Invalidate()
     End Sub
 
-    ' ── Form events ───────────────────────────────────────────────────────────
+    Private Sub OnZoomResetClick(sender As Object, e As EventArgs)
+        If Math.Abs(_zoomX - 1.0) < 0.001 Then Return
+        _zoomX = 1.0
+        UpdatePanelSize()
+        _scrollPanel.AutoScrollPosition = New Point(0, 0)
+        UpdateZoomReadout()
+        _timelinePanel.Invalidate()
+    End Sub
+
+    ''' <summary>
+    ''' Refreshes the zoom label text with the current zoom percentage and
+    ''' toggles the reset button state. Label and button stay visible at all
+    ''' times; the button is disabled when already at 100%.
+    ''' </summary>
+    Private Sub UpdateZoomReadout()
+        Dim zoomed As Boolean = Math.Abs(_zoomX - 1.0) > 0.001
+        _zoomLabel.Text = $"    |    Zoom: {CInt(_zoomX * 100)}%"
+        _zoomResetButton.Enabled = zoomed
+        LayoutInfoRow()
+    End Sub
+
+    Private Sub OnInfoLabelTextChanged(sender As Object, e As EventArgs)
+        LayoutInfoRow()
+    End Sub
+
+    ''' <summary>
+    ''' Positions the zoom label and reset button immediately to the right of
+    ''' the auto-sized info label so they sit next to the channel-count text.
+    ''' </summary>
+    Private Sub LayoutInfoRow()
+        Const GAP As Integer = 4
+        _zoomLabel.Location = New Point(_infoLabel.Right, 9)
+        _zoomResetButton.Location = New Point(_zoomLabel.Right + GAP, 7)
+    End Sub
+
+    ' ── Control events ───────────────────────────────────────────────────────
 
     Private Sub OnRefreshClick(sender As Object, e As EventArgs)
         LoadData()
     End Sub
 
-    Private Sub OnFormResize(sender As Object, e As EventArgs)
+    Private Sub OnControlResize(sender As Object, e As EventArgs)
         UpdatePanelSize()
         _timelinePanel.Invalidate()
     End Sub
@@ -797,7 +852,7 @@ Public Class ChannelTimelineForm
     End Class
 
     Private Class SyncData
-        Public SyncId As Integer
+        Public DisplayNumber As Integer
         Public Positions As New List(Of SyncPositionData)
     End Class
 
