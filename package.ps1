@@ -115,7 +115,7 @@ if (Test-Path $envFile) {
 
 if (-not $token) {
     Write-Host ""
-    Write-Host "No GITHUB_TOKEN found in .env — skipping GitHub release." -ForegroundColor DarkGray
+    Write-Host "No GITHUB_TOKEN found in .env - skipping GitHub release." -ForegroundColor DarkGray
     Write-Host "Add  GITHUB_TOKEN=ghp_...  to .env to publish automatically."
     exit 0
 }

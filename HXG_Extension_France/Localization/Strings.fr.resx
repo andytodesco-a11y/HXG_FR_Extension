@@ -279,4 +279,46 @@
   <data name="AlignX_Rotated" xml:space="preserve">
     <value>Aligner X : rotation de {0:F2}° autour de Z.</value>
   </data>
+  <data name="Timeline_GroupLabel" xml:space="preserve">
+    <value>Timeline canaux</value>
+  </data>
+  <data name="Timeline_ButtonLabel" xml:space="preserve">
+    <value>Afficher la timeline</value>
+  </data>
+  <data name="Timeline_FormTitle" xml:space="preserve">
+    <value>Timeline canaux</value>
+  </data>
+  <data name="Timeline_RefreshButton" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="Timeline_NoProgram" xml:space="preserve">
+    <value>Aucun programme disponible. Ouvrez un document multi-tourelle.</value>
+  </data>
+  <data name="Timeline_TotalTime" xml:space="preserve">
+    <value>Temps de cycle total : {0:F2} s</value>
+  </data>
+  <data name="Timeline_Channels" xml:space="preserve">
+    <value>{0} canal/canaux</value>
+  </data>
+  <data name="Timeline_ChannelEmpty" xml:space="preserve">
+    <value>(vide)</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp" xml:space="preserve">
+    <value>Opération machine</value>
+  </data>
+  <data name="Timeline_Legend_ToolPath" xml:space="preserve">
+    <value>Trajectoire</value>
+  </data>
+  <data name="Timeline_Legend_ToolChange" xml:space="preserve">
+    <value>Changement d'outil</value>
+  </data>
+  <data name="Timeline_Legend_SetupChange" xml:space="preserve">
+    <value>Changement de montage</value>
+  </data>
+  <data name="Timeline_Legend_Link" xml:space="preserve">
+    <value>Liaison</value>
+  </data>
+  <data name="Timeline_Legend_Sync" xml:space="preserve">
+    <value>Synchro</value>
+  </data>
 </root>

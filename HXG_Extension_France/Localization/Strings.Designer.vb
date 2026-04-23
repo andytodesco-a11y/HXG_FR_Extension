@@ -376,4 +376,90 @@ Friend Module Strings
         End Get
     End Property
 
+    ' ── ChannelTimeline ───────────────────────────────────────────────────────
+
+    Friend ReadOnly Property Timeline_GroupLabel As String
+        Get
+            Return S("Timeline_GroupLabel")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_ButtonLabel As String
+        Get
+            Return S("Timeline_ButtonLabel")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_FormTitle As String
+        Get
+            Return S("Timeline_FormTitle")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_RefreshButton As String
+        Get
+            Return S("Timeline_RefreshButton")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_NoProgram As String
+        Get
+            Return S("Timeline_NoProgram")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_TotalTime As String
+        Get
+            Return S("Timeline_TotalTime")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Channels As String
+        Get
+            Return S("Timeline_Channels")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_ChannelEmpty As String
+        Get
+            Return S("Timeline_ChannelEmpty")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_MachineOp As String
+        Get
+            Return S("Timeline_Legend_MachineOp")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_ToolPath As String
+        Get
+            Return S("Timeline_Legend_ToolPath")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_ToolChange As String
+        Get
+            Return S("Timeline_Legend_ToolChange")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_SetupChange As String
+        Get
+            Return S("Timeline_Legend_SetupChange")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_Link As String
+        Get
+            Return S("Timeline_Legend_Link")
+        End Get
+    End Property
+
+    Friend ReadOnly Property Timeline_Legend_Sync As String
+        Get
+            Return S("Timeline_Legend_Sync")
+        End Get
+    End Property
+
 End Module

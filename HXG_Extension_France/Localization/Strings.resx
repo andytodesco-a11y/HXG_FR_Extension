@@ -217,4 +217,48 @@
     <value>Align X: rotated {0:F2}° around Z.</value>
   </data>
 
+  <!-- ── ChannelTimeline ────────────────────────────────────────────────────── -->
+  <data name="Timeline_GroupLabel" xml:space="preserve">
+    <value>Channel Timeline</value>
+  </data>
+  <data name="Timeline_ButtonLabel" xml:space="preserve">
+    <value>Show Timeline</value>
+  </data>
+  <data name="Timeline_FormTitle" xml:space="preserve">
+    <value>Channel Timeline</value>
+  </data>
+  <data name="Timeline_RefreshButton" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Timeline_NoProgram" xml:space="preserve">
+    <value>No program available. Open a multi-turret document.</value>
+  </data>
+  <data name="Timeline_TotalTime" xml:space="preserve">
+    <value>Total cycle time: {0:F2} s</value>
+  </data>
+  <data name="Timeline_Channels" xml:space="preserve">
+    <value>{0} channel(s)</value>
+  </data>
+  <data name="Timeline_ChannelEmpty" xml:space="preserve">
+    <value>(empty)</value>
+  </data>
+  <data name="Timeline_Legend_MachineOp" xml:space="preserve">
+    <value>Machine Op.</value>
+  </data>
+  <data name="Timeline_Legend_ToolPath" xml:space="preserve">
+    <value>Toolpath</value>
+  </data>
+  <data name="Timeline_Legend_ToolChange" xml:space="preserve">
+    <value>Tool Change</value>
+  </data>
+  <data name="Timeline_Legend_SetupChange" xml:space="preserve">
+    <value>Setup Change</value>
+  </data>
+  <data name="Timeline_Legend_Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="Timeline_Legend_Sync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+
 </root>
